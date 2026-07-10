@@ -20,98 +20,11 @@ const { title, description = 'Islamic content from the Salaf', noIndex = false, 
     <meta name="description" content={description} />
     {noIndex && <meta name="robots" content="noindex" />}
     
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     
-    <!-- Global Styles -->
-    <link rel="stylesheet" href="/styles/global.css" />
-    
-    <!-- RTL Auto-Detection - Line by Line -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        function hasArabic(text) {
-          const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
-          return arabicPattern.test(text);
-        }
-
-        // Process each paragraph in the post body
-        const postBodies = document.querySelectorAll('.post-body');
-        
-        postBodies.forEach(function(container) {
-          const paragraphs = container.querySelectorAll('p');
-          
-          paragraphs.forEach(function(p) {
-            const text = p.textContent || '';
-            
-            // Check if the paragraph contains a mix of Arabic and English
-            const hasArabicText = hasArabic(text);
-            const hasLatinText = /[a-zA-Z]/.test(text);
-            
-            // If it has both, we need per-line handling
-            if (hasArabicText && hasLatinText) {
-              // Split by newlines or periods or other delimiters
-              // The simplest approach: split by newlines if present
-              const html = p.innerHTML;
-              
-              // If there's a <br> or newline, split the content
-              if (html.includes('<br>') || html.includes('<br/>') || html.includes('\n')) {
-                // We'll handle this case by letting the browser decide
-                // Just set dir="auto" and let it work
-                p.setAttribute('dir', 'auto');
-              } else {
-                // For single lines with mixed content, 
-                // we need to identify the main language
-                // Count Arabic vs Latin characters
-                let arabicCount = 0;
-                let latinCount = 0;
-                for (const char of text) {
-                  if (/[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(char)) {
-                    arabicCount++;
-                  } else if (/[a-zA-Z]/.test(char)) {
-                    latinCount++;
-                  }
-                }
-                
-                // If more Arabic than Latin, use RTL; otherwise LTR
-                if (arabicCount > latinCount) {
-                  p.setAttribute('dir', 'rtl');
-                } else {
-                  p.setAttribute('dir', 'ltr');
-                }
-              }
-            } else if (hasArabicText) {
-              // Pure Arabic - RTL
-              p.setAttribute('dir', 'rtl');
-            } else {
-              // Pure English - LTR
-              p.setAttribute('dir', 'ltr');
-            }
-          });
-
-          // Also handle blockquotes
-          container.querySelectorAll('blockquote').forEach(function(bq) {
-            const text = bq.textContent || '';
-            if (hasArabic(text)) {
-              bq.setAttribute('dir', 'auto');
-            } else {
-              bq.setAttribute('dir', 'ltr');
-            }
-          });
-        });
-
-        // Card excerpts
-        document.querySelectorAll('.card-excerpt.auto-dir').forEach(function(el) {
-          const text = el.textContent || '';
-          if (hasArabic(text)) {
-            el.setAttribute('dir', 'auto');
-          } else {
-            el.setAttribute('dir', 'ltr');
-          }
-        });
-      });
-    </script>
+    <link rel="stylesheet" href="/src/styles/global.css" />
   </head>
   <body>
     <div class="site-wrapper">

@@ -284,3 +284,7 @@ function getExcerpt(body: string, maxLength = 130) {
     .post-body blockquote { padding: 0.8rem 1rem; }
   }
 </style>
+<script>
+  document.querySelectorAll('.post-body p, .post-body blockquote, .post-body h1, .post-body h2, .post-body h3, .post-body h4, .post-body li')
+    .forEach(el => el.dir = 'auto');
+</script>

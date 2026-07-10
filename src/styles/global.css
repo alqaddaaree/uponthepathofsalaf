@@ -153,3 +153,15 @@ img {
   .section-hd { flex-wrap: wrap; gap: 0.5rem; }
   .section-title { font-size: 1.2rem; }
 }
+/* For paragraphs with dir="rtl" from the conversion */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="ltr"] {
+  text-align: left;
+}
+
+.post-body p {
+  text-align: start;
+}
