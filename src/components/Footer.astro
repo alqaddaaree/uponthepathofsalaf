@@ -1,0 +1,114 @@
+---
+// src/components/Footer.astro
+---
+
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand-name">The Salaf's Path</div>
+      <span class="footer-brand-ar">درب السلف</span>
+      <p class="footer-brand-desc">
+        A digital library of Islamic knowledge from the Quran, Sunnah, and the classical scholars
+        of Ahl al-Sunnah wal-Jamā'ah — compiled for the seekers of knowledge wherever they may be.
+      </p>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Topics</div>
+      <ul class="footer-links">
+        <li><a href="/topics/aqeedah">Aqeedah</a></li>
+        <li><a href="/topics/fiqh">Fiqh</a></li>
+        <li><a href="/topics/hadith">Hadith</a></li>
+        <li><a href="/topics/tafsir">Tafsir</a></li>
+        <li><a href="/topics/seerah">Seerah</a></li>
+        <li><a href="/topics/knowledge">Knowledge</a></li>
+      </ul>
+    </div>
+
+    <div>
+      <div class="footer-col-title">Links</div>
+      <ul class="footer-links">
+        <li><a href="https://t.me/uponthepathofsalaf" target="_blank" rel="noopener">Telegram Channel</a></li>
+        <li><a href="/about">About This Library</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 1446 AH · The Salaf's Path · Content from authentic Islamic sources</span>
+    <span class="footer-ayah">وَفَوْقَ كُلِّ ذِي عِلْمٍ عَلِيمٌ</span>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--primary);
+    color: rgba(255,255,255,0.65);
+    padding: 3.5rem 1.5rem 2rem;
+    margin-top: 4rem;
+  }
+  .footer-grid {
+    max-width: var(--container);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 2.2fr 1fr 1fr;
+    gap: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+  .footer-brand-name {
+    font-family: var(--font-ar);
+    font-size: 1.05rem;
+    color: #fff;
+    margin-bottom: 0.2rem;
+  }
+  .footer-brand-ar {
+    font-family: var(--font-ar);
+    font-size: 0.85rem;
+    color: var(--accent);
+    direction: rtl;
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+  .footer-brand-desc { font-size: 0.8rem; line-height: 1.7; }
+  .footer-col-title {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.875rem;
+  }
+  .footer-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .footer-links a {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.55);
+    transition: color 0.15s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-bottom {
+    max-width: var(--container);
+    margin: 1.5rem auto 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.72rem;
+  }
+  .footer-ayah {
+    font-family: var(--font-ar);
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.4);
+    direction: rtl;
+  }
+
+  @media (max-width: 768px) {
+    .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+    .footer-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+</style>

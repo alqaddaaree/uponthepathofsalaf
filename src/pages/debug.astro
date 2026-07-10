@@ -1,0 +1,26 @@
+---
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('posts');
+---
+
+<html>
+  <head><title>Debug</title></head>
+  <body>
+    <h1>Content Debug</h1>
+    <p>Total posts in collection: <strong>{posts.length}</strong></p>
+    {posts.length === 0 ? (
+      <p style="color:red;">No posts found! Check your content config.</p>
+    ) : (
+      <ul>
+        {posts.slice(0, 10).map((post) => (
+          <li>
+            <strong>{post.data.id}</strong> — {post.data.title}
+            <br />
+            <small>Topics: {post.data.topics?.join(', ') || 'none'}</small>
+          </li>
+        ))}
+      </ul>
+    )}
+  </body>
+</html>

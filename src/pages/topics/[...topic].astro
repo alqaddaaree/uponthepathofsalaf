@@ -1,0 +1,216 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  const allTopics = new Set<string>();
+  for (const post of posts) {
+    for (const topic of post.data.topics || []) {
+      allTopics.add(topic);
+    }
+  }
+  return Array.from(allTopics).map((topic) => ({
+    params: { topic: topic.toLowerCase() },
+    props: { topic },
+  }));
+}
+
+const { topic } = Astro.props;
+const allPosts = await getCollection('posts');
+
+const filteredPosts = allPosts
+  .filter((post) => post.data.topics?.includes(topic))
+  .sort((a, b) => new Date(b.data.date) - new Date(a.data.date));
+
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+    .replace(/`(.*?)`/g, '$1')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/>\s/g, '')
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getExcerpt(body: string, maxLength = 130) {
+  const clean = stripMarkdown(body);
+  if (clean.length <= maxLength) return clean;
+  return clean.slice(0, maxLength) + '…';
+}
+---
+
+<Layout title={`${topic} | The Salaf's Path`}>
+  <div class="topic-header">
+    <svg class="topic-header-geo" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="star-tile-2" x="0" y="0" width="90" height="90" patternUnits="userSpaceOnUse">
+          <polygon points="45,3 48.5,17 62,12 55,25 68,31 54,34 56,50 45,41 34,50 36,34 22,31 35,25 28,12 41.5,17"
+                   fill="none" stroke="rgba(201,168,76,0.12)" stroke-width="0.9"/>
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#star-tile-2)"/>
+    </svg>
+
+    <div class="topic-header-inner">
+      <a href="/topics" class="topic-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M19 12H5M12 19l-7 7-7 7"/>
+        </svg>
+        All Topics
+      </a>
+
+      <div class="topic-badge">Topic</div>
+      <h1 class="topic-header-name">{topic}</h1>
+      <div class="topic-header-ar">—</div>
+      <p class="topic-header-desc">
+        Lessons and content related to the topic of {topic.toLowerCase()}.
+      </p>
+
+      <div class="topic-stats">
+        <div class="tstat">
+          <strong>{filteredPosts.length}</strong>
+          <span>Lessons</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="posts-section">
+    <div class="container">
+      <div class="section-hd">
+        <h2 class="section-title">Lessons on {topic}</h2>
+        <span style="font-size:0.8125rem;color:var(--text-light);">
+          {filteredPosts.length} lesson{filteredPosts.length > 1 ? 's' : ''}
+        </span>
+      </div>
+
+      {filteredPosts.length > 0 ? (
+        <div class="posts-grid">
+          {filteredPosts.map((post) => (
+            <PostCard
+              id={post.data.id}
+              title={post.data.title}
+              date={post.data.date}
+              author={post.data.author ?? undefined}
+              quotedAuthor={post.data.quotedAuthor ?? undefined}
+              topics={post.data.topics}
+              excerpt={getExcerpt(post.body)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div class="empty-state">
+          <p>No posts found for this topic.</p>
+        </div>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .topic-header {
+    background: linear-gradient(135deg, #162f25 0%, var(--primary) 55%, var(--secondary) 100%);
+    padding: 3rem 1.5rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .topic-header-geo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+  .topic-header-inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    position: relative;
+  }
+  .topic-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.79rem;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 1.5rem;
+    transition: color 0.15s;
+  }
+  .topic-back:hover { color: var(--accent); }
+  .topic-badge {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    border: 1px solid rgba(201,168,76,0.35);
+    background: rgba(201,168,76,0.1);
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    margin-bottom: 0.875rem;
+  }
+  .topic-header-name {
+    font-family: var(--font-ar);
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 0.375rem;
+  }
+  .topic-header-ar {
+    font-family: var(--font-ar);
+    font-size: 1.25rem;
+    color: var(--accent);
+    direction: rtl;
+    display: inline-block;
+    margin-bottom: 0.875rem;
+  }
+  .topic-header-desc {
+    font-size: 0.9375rem;
+    color: rgba(255,255,255,0.75);
+    max-width: 520px;
+    line-height: 1.72;
+    margin-bottom: 1.5rem;
+  }
+  .topic-stats { display: flex; gap: 2.25rem; }
+  .tstat { color: rgba(255,255,255,0.8); }
+  .tstat strong {
+    display: block;
+    font-family: var(--font-ar);
+    font-size: 1.25rem;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .tstat span { font-size: 0.75rem; opacity: 0.65; letter-spacing: 0.04em; }
+
+  .posts-section { padding: 2.5rem 0 3rem; }
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.125rem;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-light);
+    background: var(--card-bg);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+  }
+
+  @media (max-width: 1024px) {
+    .posts-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .posts-grid { grid-template-columns: 1fr; }
+    .topic-stats { gap: 1.5rem; }
+  }
+  @media (max-width: 480px) {
+    .topic-header-desc { font-size: 0.85rem; }
+  }
+</style>

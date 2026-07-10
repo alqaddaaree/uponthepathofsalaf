@@ -1,10 +1,7 @@
 {
-  "name": "celestial-conjunction",
-  "type": "module",
+  "name": "uponthepathofthesalaf",
   "version": "0.0.1",
-  "engines": {
-    "node": ">=22.12.0"
-  },
+  "type": "module",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
@@ -12,6 +9,7 @@
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.0.7"
+    "@astrojs/mdx": "^4.0.0",
+    "astro": "^7.0.0"
   }
 }

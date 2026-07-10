@@ -1,0 +1,286 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+const modules = import.meta.glob('../../content/posts/*.md', { eager: true });
+const allPostModules = Object.values(modules).map((mod: any) => ({
+  default: mod.default,
+  frontmatter: mod.frontmatter,
+}));
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  return posts.map((post) => ({
+    params: { id: String(post.data.id) },
+    props: { id: post.data.id },
+  }));
+}
+
+const { id } = Astro.props;
+const postEntry = allPostModules.find((p) => p.frontmatter.id === id);
+
+if (!postEntry) {
+  return Astro.redirect('/');
+}
+
+const { default: Content, frontmatter } = postEntry;
+
+const formattedDate = new Date(frontmatter.date).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const allPosts = await getCollection('posts');
+const relatedPosts = allPosts
+  .filter((p) => p.data.id !== frontmatter.id)
+  .filter((p) => p.data.topics?.some((t) => frontmatter.topics?.includes(t)))
+  .sort((a, b) => new Date(b.data.date) - new Date(a.data.date))
+  .slice(0, 2);
+
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+    .replace(/`(.*?)`/g, '$1')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/>\s/g, '')
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getExcerpt(body: string, maxLength = 130) {
+  const clean = stripMarkdown(body);
+  if (clean.length <= maxLength) return clean;
+  return clean.slice(0, maxLength) + '…';
+}
+---
+
+<Layout title={`${frontmatter.title} | The Salaf's Path`}>
+  <article class="post-detail">
+    <nav class="breadcrumb">
+      <a href="/">Home</a>
+      <span>/</span>
+      {frontmatter.topics && frontmatter.topics.length > 0 && (
+        <>
+          <a href={`/topics/${frontmatter.topics[0].toLowerCase()}`}>
+            {frontmatter.topics[0]}
+          </a>
+          <span>/</span>
+        </>
+      )}
+      <span style="color:var(--text);">{frontmatter.title}</span>
+    </nav>
+
+    {frontmatter.topics && frontmatter.topics.length > 0 && (
+      <div class="post-topic-pill">{frontmatter.topics.join(' · ')}</div>
+    )}
+    <h1 class="post-main-title">{frontmatter.title}</h1>
+
+    <div class="post-meta-bar">
+      <div class="meta-item">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+        </svg>
+        {formattedDate}
+      </div>
+      {(frontmatter.author || frontmatter.quotedAuthor) && (
+        <div class="meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+          {frontmatter.quotedAuthor || frontmatter.author}
+        </div>
+      )}
+      {frontmatter.edited && (
+        <div class="meta-item">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+          </svg>
+          Edited
+        </div>
+      )}
+    </div>
+
+    <!-- Post Body - JavaScript will apply dir to each paragraph/block -->
+    <div class="post-body">
+      <Content />
+    </div>
+
+    {frontmatter.topics && frontmatter.topics.length > 0 && (
+      <div class="post-tags">
+        {frontmatter.topics.map((topic: string) => (
+          <a href={`/topics/${topic.toLowerCase()}`} class="tag">#{topic}</a>
+        ))}
+      </div>
+    )}
+
+    <div class="ornament">
+      <div class="ornament-line"></div>
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="11,1 13.2,7.5 20,7.5 14.4,11.5 16.6,18 11,14 5.4,18 7.6,11.5 2,7.5 8.8,7.5"/>
+      </svg>
+      <div class="ornament-line"></div>
+    </div>
+
+    {relatedPosts.length > 0 && (
+      <div class="related-posts">
+        <div class="section-hd">
+          <h2 class="section-title">Related Lessons</h2>
+        </div>
+        <div class="related-grid">
+          {relatedPosts.map((p) => (
+            <PostCard
+              id={p.data.id}
+              title={p.data.title}
+              date={p.data.date}
+              author={p.data.author ?? undefined}
+              quotedAuthor={p.data.quotedAuthor ?? undefined}
+              topics={p.data.topics}
+              excerpt={getExcerpt(p.body)}
+            />
+          ))}
+        </div>
+      </div>
+    )}
+
+    <div class="post-footer-nav">
+      <a href="/" class="back-link">← Back to all posts</a>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .post-detail { max-width: 720px; margin: 0 auto; padding: 2.5rem 0 4rem; }
+  
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.79rem;
+    color: var(--text-light);
+    margin-bottom: 2rem;
+    font-family: var(--font-english);
+  }
+  .breadcrumb a:hover { color: var(--accent); }
+  .breadcrumb span { color: var(--border); }
+
+  .post-topic-pill {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    background: rgba(201,168,76,0.1);
+    padding: 0.28rem 0.7rem;
+    border-radius: var(--radius-sm);
+    margin-bottom: 1.125rem;
+  }
+  
+  .post-main-title {
+    font-family: var(--font-title);
+    font-size: clamp(1.45rem, 3vw, 2.1rem);
+    font-weight: 700;
+    color: var(--primary);
+    line-height: 1.3;
+    margin-bottom: 1.25rem;
+  }
+  
+  .post-meta-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    padding: 0.9rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.79rem;
+    color: var(--text-light);
+    font-family: var(--font-english);
+  }
+  .meta-item svg { color: var(--accent); flex-shrink: 0; }
+
+  .post-body {
+    font-size: 0.9875rem;
+    line-height: 1.88;
+    color: var(--text);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+  
+  /* Each paragraph/block will get its own direction via JavaScript */
+  .post-body p, .post-body blockquote, .post-body h1, .post-body h2, .post-body h3, .post-body h4, .post-body li {
+    font-family: var(--font-english), var(--font-arabic);
+  }
+  
+  .post-body p { margin-bottom: 1.25rem; }
+  .post-body h1, .post-body h2, .post-body h3, .post-body h4 {
+    font-family: var(--font-title);
+    color: var(--primary);
+    margin: 2rem 0 0.75rem;
+  }
+  .post-body blockquote {
+    border-left: 4px solid var(--accent);
+    background: var(--light-gold);
+    padding: 1.25rem 1.5rem;
+    margin: 1.75rem 0;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  }
+  .post-body blockquote p { margin-bottom: 0.5rem; font-style: italic; color: #3a3528; }
+  .post-body blockquote cite {
+    font-size: 0.79rem;
+    color: var(--text-light);
+    font-style: normal;
+    font-weight: 600;
+  }
+
+  /* RTL blockquotes */
+  .post-body blockquote[dir="rtl"] {
+    border-left: none;
+    border-right: 4px solid var(--accent);
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+  }
+
+  .post-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 2rem 0; }
+  .tag {
+    font-size: 0.72rem;
+    padding: 0.22rem 0.6rem;
+    background: var(--light-gold);
+    border: 1px solid rgba(201,168,76,0.28);
+    border-radius: var(--radius-sm);
+    color: var(--text-light);
+    transition: all 0.18s;
+  }
+  .tag:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .related-posts { padding-top: 2rem; border-top: 1px solid var(--border); }
+  .related-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+
+  .post-footer-nav { margin-top: 2.5rem; }
+  .back-link {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    transition: color 0.15s;
+    font-family: var(--font-english);
+  }
+  .back-link:hover { color: var(--primary); }
+
+  @media (max-width: 768px) {
+    .post-detail { padding: 1.5rem 0; }
+    .related-grid { grid-template-columns: 1fr; }
+    .post-meta-bar { gap: 0.75rem; }
+  }
+  @media (max-width: 480px) {
+    .post-body blockquote { padding: 0.8rem 1rem; }
+  }
+</style>

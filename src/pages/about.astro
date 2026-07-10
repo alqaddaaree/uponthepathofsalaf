@@ -1,0 +1,90 @@
+---
+// src/pages/about.astro
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="About | The Salaf's Path">
+  <div class="about-container">
+    <h1 class="about-title">📖 About This Site</h1>
+
+    <div class="about-content">
+      <p>
+        This is a digital library of content from the Telegram channel
+        <strong>Upon the Path of Salaf</strong> (عَلَىٰ نَهجِ السَّلَفِ).
+      </p>
+
+      <p>
+        The channel shares authentic Islamic knowledge from the Qur'an, the Sunnah,
+        and the understanding of the Salaf — the righteous predecessors.
+      </p>
+
+      <h2>Purpose</h2>
+      <p>
+        This website aims to make the beneficial content from the channel more
+        accessible, searchable, and organized for seekers of knowledge.
+      </p>
+
+      <h2>Content</h2>
+      <ul>
+        <li><strong>Topics:</strong> Each post is tagged with relevant topics for easy browsing.</li>
+        <li><strong>Quotes:</strong> Many posts contain quotes from scholars like Ibn Uthaymeen, Al-Albani, Ibn Taymiyyah, and others.</li>
+        <li><strong>Translations:</strong> Content is primarily in English with Arabic text where appropriate.</li>
+      </ul>
+
+      <h2>Connect</h2>
+      <p>
+        Visit the original channel on Telegram:
+        <br />
+        <a href="https://t.me/uponthepathofsalaf" target="_blank" rel="noopener">
+          t.me/uponthepathofsalaf
+        </a>
+      </p>
+
+      <h2>Acknowledgment</h2>
+      <p>
+        May Allah reward all those who contributed to this content — the scholars,
+        the translators, and the channel admins. May Allah make this a source of
+        benefit for the Ummah.
+      </p>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .about-container {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--card-bg);
+    padding: 2.5rem 3rem;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .about-title {
+    font-family: var(--font-ar);
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--light-gold);
+  }
+  .about-content p { margin-bottom: 1rem; line-height: 1.8; }
+  .about-content h2 {
+    font-family: var(--font-ar);
+    font-size: 1.3rem;
+    color: var(--primary);
+    margin: 1.8rem 0 0.6rem 0;
+  }
+  .about-content ul { padding-left: 1.5rem; margin: 0.6rem 0 1rem 0; }
+  .about-content li { margin-bottom: 0.4rem; }
+  .about-content a {
+    color: var(--primary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .about-content a:hover { color: var(--secondary); }
+
+  @media (max-width: 600px) {
+    .about-container { padding: 1.5rem; }
+    .about-title { font-size: 1.6rem; }
+  }
+</style>

@@ -1,0 +1,155 @@
+/* ============================================================
+   GLOBAL STYLES — The Salaf's Path
+   ============================================================ */
+
+:root {
+  --primary:      #1B4332;
+  --secondary:    #2D6A4F;
+  --accent:       #C9A84C;
+  --accent-dark:  #b8963d;
+  --light-gold:   #F0E6D3;
+  --bg:           #FAF8F4;
+  --card-bg:      #FFFFFF;
+  --text:         #2D2D2D;
+  --text-light:   #6B6B6B;
+  --border:       #E5DDD0;
+  
+  --font-english: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-arabic:  'Amiri', 'Noto Naskh Arabic', 'Scheherazade New', serif;
+  --font-title:   'Cinzel', Georgia, serif;
+  --font-code:    'Fira Code', monospace;
+  
+  --container:    1120px;
+  --radius:       8px;
+  --radius-sm:    4px;
+  --shadow:       0 2px 12px rgba(27,67,50,0.06);
+  --shadow-hover: 0 8px 28px rgba(27,67,50,0.10);
+  --header-h:     68px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-english), var(--font-arabic);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+p, li, span, div, .card-excerpt, .hero-tagline, .topic-desc, .footer-brand-desc,
+.post-body, .post-body p, .post-body li, .post-body blockquote p {
+  font-family: var(--font-english), var(--font-arabic);
+}
+
+h1, h2, h3, h4, h5, h6,
+.post-title, .card-title, .section-title, .hero-title,
+.topic-name, .topic-card-name, .about-title, .post-main-title,
+.logo-en, .hero-title, .topic-header-name {
+  font-family: var(--font-title), var(--font-arabic);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.card-meta, .post-meta, .breadcrumb, .card-footer, .meta-item,
+.tstat span, .hero-stat-lbl, .cloud-label, .topic-count,
+.post-date, .card-date, .card-author, .post-author, .post-quoted,
+.breadcrumb span, .breadcrumb a, .post-topic-pill, .post-tags .tag,
+.back-link, .section-link {
+  font-family: var(--font-english);
+}
+
+code, pre, .code {
+  font-family: var(--font-code);
+}
+
+/* RTL support */
+[dir="rtl"] {
+  direction: rtl;
+  text-align: right;
+}
+
+/* RTL blockquotes */
+[dir="rtl"] blockquote,
+[dir="rtl"] .post-body blockquote {
+  border-left: none;
+  border-right: 4px solid var(--accent);
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+/* 
+  For mixed Arabic/English lines in the same paragraph:
+  Use text-align: start so the browser aligns based on direction
+*/
+.post-body p {
+  text-align: start;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.section-hd {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-family: var(--font-title), var(--font-arabic);
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.section-link {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.section-link:hover { color: var(--primary); }
+
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 2.5rem 0;
+}
+.ornament-line {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--accent), transparent);
+}
+.ornament svg { color: var(--accent); flex-shrink: 0; }
+
+.text-muted { color: var(--text-light); }
+.text-gold { color: var(--accent); }
+.bg-primary { background: var(--primary); }
+.bg-gold-light { background: var(--light-gold); }
+
+@media (max-width: 768px) {
+  .section-hd { flex-wrap: wrap; gap: 0.5rem; }
+  .section-title { font-size: 1.2rem; }
+}

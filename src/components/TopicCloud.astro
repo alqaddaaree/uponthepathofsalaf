@@ -1,0 +1,88 @@
+---
+// src/components/TopicCloud.astro
+export interface Props {
+  topics: { name: string; count: number }[];
+  active?: string;
+}
+
+const { topics, active } = Astro.props;
+---
+
+<div class="topic-cloud">
+  <div class="topic-cloud-inner">
+    <span class="cloud-label">Browse:</span>
+    <a href="/" class={`topic-pill ${!active ? 'active' : ''}`}>
+      All <span class="pill-count">{topics.reduce((acc, t) => acc + t.count, 0)}</span>
+    </a>
+    {topics.map((topic) => (
+      <a
+        href={`/topics/${topic.name.toLowerCase()}`}
+        class={`topic-pill ${active === topic.name ? 'active' : ''}`}
+      >
+        {topic.name} <span class="pill-count">{topic.count}</span>
+      </a>
+    ))}
+  </div>
+</div>
+
+<style>
+  .topic-cloud {
+    background: var(--card-bg);
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .topic-cloud-inner {
+    max-width: var(--container);
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .cloud-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    color: var(--text-light);
+    flex-shrink: 0;
+    margin-right: 0.25rem;
+  }
+  .topic-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.3rem 0.75rem;
+    background: var(--light-gold);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--primary);
+    transition: all 0.18s;
+    white-space: nowrap;
+  }
+  .topic-pill:hover,
+  .topic-pill.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .pill-count {
+    font-size: 0.65rem;
+    font-weight: 700;
+    background: rgba(27,67,50,0.14);
+    border-radius: 50px;
+    padding: 0.05rem 0.35rem;
+    line-height: 1.6;
+  }
+  .topic-pill:hover .pill-count,
+  .topic-pill.active .pill-count {
+    background: rgba(255,255,255,0.28);
+  }
+
+  @media (max-width: 480px) {
+    .topic-cloud-inner { gap: 0.4rem; }
+    .topic-pill { font-size: 0.7rem; padding: 0.2rem 0.6rem; }
+  }
+</style>

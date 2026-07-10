@@ -1,0 +1,65 @@
+# .pages.yml
+site:
+  title: "The Salaf's Path"
+  description: "Islamic content from the Salaf"
+
+# Media uploads configuration
+media:
+  - name: images
+    input: public/images/uploads
+    output: /images/uploads
+
+# Content collections
+collections:
+  - name: posts
+    label: Posts
+    path: src/content/posts
+    format: frontmatter
+    create: true
+    delete: true
+    fields:
+      - name: id
+        label: ID
+        type: number
+        required: true
+        
+      - name: title
+        label: Title
+        type: string
+        required: true
+        
+      - name: date
+        label: Date
+        type: datetime
+        required: true
+        
+      - name: author
+        label: Author
+        type: string
+        required: false
+        
+      - name: quotedAuthor
+        label: Quoted Author
+        type: string
+        required: false
+        
+      - name: topics
+        label: Topics
+        type: list
+        default: []
+        items:
+          type: string
+        
+      - name: type
+        label: Type
+        type: select
+        options:
+          - message
+          - article
+          - translation
+        default: message
+        
+      - name: body
+        label: Body
+        type: markdown
+        required: true

@@ -1,17 +1,132 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/Hero.astro';
+import TopicCloud from '../components/TopicCloud.astro';
+import PostCard from '../components/PostCard.astro';
+import { getCollection } from 'astro:content';
 
+// Get all posts
+const allPosts = await getCollection('posts');
+
+// Sort by date (newest first)
+const sortedPosts = allPosts.sort((a, b) =>
+  new Date(b.data.date) - new Date(a.data.date)
+);
+
+// Featured post (first one for now)
+const featuredPost = sortedPosts[0] || null;
+const restPosts = sortedPosts.slice(1, 7); // Show 6 more
+
+// Build topic counts
+const topicMap = new Map<string, number>();
+for (const post of allPosts) {
+  for (const topic of post.data.topics || []) {
+    topicMap.set(topic, (topicMap.get(topic) || 0) + 1);
+  }
+}
+const topics = Array.from(topicMap.entries())
+  .map(([name, count]) => ({ name, count }))
+  .sort((a, b) => b.count - a.count)
+  .slice(0, 12);
+
+// Strip markdown for excerpts
+function stripMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/\*(.*?)\*/g, '$1')
+    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+    .replace(/`(.*?)`/g, '$1')
+    .replace(/#{1,6}\s/g, '')
+    .replace(/>\s/g, '')
+    .replace(/\n/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function getExcerpt(body: string, maxLength = 130) {
+  const clean = stripMarkdown(body);
+  if (clean.length <= maxLength) return clean;
+  return clean.slice(0, maxLength) + '…';
+}
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Home | The Salaf's Path">
+  <Hero totalPosts={allPosts.length} totalTopics={topicMap.size} />
+
+  <TopicCloud topics={topics} />
+
+  <div class="posts-section">
+    <div class="container">
+      <div class="section-hd">
+        <h2 class="section-title">Recent Lessons</h2>
+        <a href="/topics" class="section-link">View all →</a>
+      </div>
+
+      <div class="posts-grid">
+        {featuredPost && (
+          <PostCard
+            id={featuredPost.data.id}
+            title={featuredPost.data.title}
+            date={featuredPost.data.date}
+            author={featuredPost.data.author ?? undefined}
+            quotedAuthor={featuredPost.data.quotedAuthor ?? undefined}
+            topics={featuredPost.data.topics}
+            excerpt={getExcerpt(featuredPost.body)}
+            featured={true}
+          />
+        )}
+
+        {restPosts.map((post) => (
+          <PostCard
+            id={post.data.id}
+            title={post.data.title}
+            date={post.data.date}
+            author={post.data.author ?? undefined}
+            quotedAuthor={post.data.quotedAuthor ?? undefined}
+            topics={post.data.topics}
+            excerpt={getExcerpt(post.body)}
+          />
+        ))}
+      </div>
+
+      {allPosts.length > 7 && (
+        <div class="load-more-wrap">
+          <a href="/topics" class="btn-load-more">Load More Lessons</a>
+        </div>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .posts-section { padding: 2.5rem 0 3rem; }
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.125rem;
+  }
+  .load-more-wrap { text-align: center; margin-top: 2.25rem; }
+  .btn-load-more {
+    display: inline-block;
+    padding: 0.7rem 2.25rem;
+    background: transparent;
+    border: 1.5px solid var(--primary);
+    color: var(--primary);
+    border-radius: 50px;
+    font-family: var(--font-ui);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.02em;
+    transition: background 0.18s, color 0.18s;
+    text-decoration: none;
+  }
+  .btn-load-more:hover { background: var(--primary); color: #fff; }
+
+  @media (max-width: 1024px) {
+    .posts-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .posts-grid { grid-template-columns: 1fr; }
+  }
+</style>

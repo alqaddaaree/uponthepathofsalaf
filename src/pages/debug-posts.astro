@@ -1,0 +1,27 @@
+---
+import { getCollection } from 'astro:content';
+const posts = await getCollection('posts');
+---
+<html>
+  <head><title>Debug Posts</title></head>
+  <body>
+    <h1>Posts Debug</h1>
+    <p>Total: {posts.length}</p>
+    <ul>
+      {posts.slice(0, 3).map((post) => (
+        <li>
+          <strong>{post.data.id}:</strong> {post.data.title}
+          <br/>
+          Has render: {typeof post.render === 'function' ? '✅' : '❌'}
+          <br/>
+          Has content: {post.content ? '✅' : '❌'}
+          <br/>
+          Type: {typeof post}
+          <br/>
+          Keys: {Object.keys(post).join(', ')}
+          <hr/>
+        </li>
+      ))}
+    </ul>
+  </body>
+</html>

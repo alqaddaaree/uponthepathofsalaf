@@ -1,0 +1,165 @@
+---
+// src/pages/topics/index.astro
+import Layout from '../../layouts/Layout.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('posts');
+
+const topicMap = new Map<string, number>();
+for (const post of allPosts) {
+  for (const topic of post.data.topics || []) {
+    topicMap.set(topic, (topicMap.get(topic) || 0) + 1);
+  }
+}
+
+const topics = Array.from(topicMap.entries())
+  .map(([name, count]) => ({ name, count }))
+  .sort((a, b) => b.count - a.count);
+
+// Icons for topics (mapped by name)
+const topicIcons: Record<string, string> = {
+  Aqeedah: '🕌',
+  Fiqh: '⚖️',
+  Hadith: '📜',
+  Tafsir: '📖',
+  Seerah: '🌙',
+  Patience: '🌿',
+  Trials: '🔥',
+  Knowledge: '✨',
+  Tazkiyah: '💎',
+  Manhaj: '🛡️',
+  "Du'a": '🤲',
+  Dhikr: '🌟',
+};
+const defaultIcon = '📚';
+---
+
+<Layout title="Topics | The Salaf's Path">
+  <div class="topics-page">
+    <div class="container">
+      <div class="page-header">
+        <div class="page-eyebrow">Browse the Library</div>
+        <h1 class="page-title">Topics of Knowledge</h1>
+        <p class="page-subtitle">
+          Explore the Islamic sciences organised by discipline — each topic drawn from the Quran,
+          Sunnah, and the words of the classical scholars.
+        </p>
+      </div>
+
+      <div class="topics-grid">
+        {topics.map(({ name, count }) => {
+          const icon = topicIcons[name] || defaultIcon;
+          return (
+            <a href={`/topics/${name.toLowerCase()}`} class="topic-card">
+              <div class="topic-icon">{icon}</div>
+              <div class="topic-name">{name}</div>
+              <span class="topic-name-ar">—</span>
+              <p class="topic-desc">Lessons on {name.toLowerCase()}</p>
+              <div class="topic-count"><span>{count}</span> lesson{count > 1 ? 's' : ''}</div>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .topics-page { padding: 3rem 0 4rem; }
+  .page-header { text-align: center; margin-bottom: 3rem; }
+  .page-eyebrow {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .page-title {
+    font-family: var(--font-ar);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.75rem;
+  }
+  .page-subtitle {
+    font-size: 0.9375rem;
+    color: var(--text-light);
+    max-width: 460px;
+    margin: 0 auto;
+    line-height: 1.68;
+  }
+
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.125rem;
+  }
+  .topic-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+  }
+  .topic-card::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.22s;
+  }
+  .topic-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-hover);
+    border-color: rgba(201,168,76,0.3);
+  }
+  .topic-card:hover::after { transform: scaleX(1); }
+  .topic-icon { font-size: 1.625rem; margin-bottom: 0.75rem; }
+  .topic-name {
+    font-family: var(--font-ar);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 0.2rem;
+  }
+  .topic-name-ar {
+    font-family: var(--font-ar);
+    font-size: 0.85rem;
+    color: var(--accent);
+    direction: rtl;
+    display: block;
+    margin-bottom: 0.625rem;
+  }
+  .topic-desc {
+    font-size: 0.785rem;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 0.875rem;
+  }
+  .topic-count {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-light);
+  }
+  .topic-count span { color: var(--accent); }
+
+  @media (max-width: 1024px) {
+    .topics-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .topics-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 480px) {
+    .topics-grid { grid-template-columns: 1fr; }
+    .topic-card { padding: 1.2rem; }
+  }
+</style>
