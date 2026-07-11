@@ -1,6 +1,7 @@
 import { getCollection } from 'astro:content';
 
 function stripMarkdown(text) {
+  if (!text) return '';  // ← add this guard
   return text
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/\*(.*?)\*/g, '$1')
@@ -17,16 +18,16 @@ export async function GET() {
   const allPosts = await getCollection('posts');
 
   const searchIndex = allPosts.map(post => {
-    // Strip markdown from body
-    const cleanBody = stripMarkdown(post.body);
-    const excerpt = cleanBody.slice(0, 200).trim() + '…';
+    // Use post.data.body (not post.body) for YAML files
+    const cleanBody = stripMarkdown(post.data.body || '');
+    const excerpt = cleanBody.slice(0, 200).trim() + (cleanBody.length > 200 ? '…' : '');
 
     return {
-      id: post.data.id,
+      id: post.id,  // use slug from filename
       title: stripMarkdown(post.data.title),
       excerpt: excerpt,
       topics: post.data.topics || [],
-      author: post.data.author || post.data.quotedAuthor || '',
+      author: post.data.author || '',
     };
   });
 
