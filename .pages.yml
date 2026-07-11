@@ -3,7 +3,7 @@ content:
     label: Posts
     type: collection
     path: src/content/posts
-    extension: yaml          # ← .yaml files, not .md
+    extension: yaml
     create: true
     delete: true
     fields:
@@ -11,26 +11,38 @@ content:
         label: ID
         type: string
         required: true
+        help: "Unique number for this post (e.g., 1, 2, 3...)"
+      
       - name: title
         label: Title
         type: string
         required: true
+        help: "The main title of the post (this will appear as the heading)"
+      
       - name: date
         label: Date
         type: string
         required: true
+        help: "ISO format (e.g., 2025-11-07T19:11:46)"
+      
       - name: author
-        label: Author
+        label: Author (optional)
         type: string
-        required: false
+        help: "Who wrote the post (e.g., 'Upon the path of the Salaf')"
+      
       - name: quotedAuthor
-        label: Quoted Author
+        label: Quoted Author (optional)
         type: string
-        required: false
+        help: "If the post quotes a scholar, put their name here"
+      
       - name: topics
         label: Topics
-        type: string          # comma-separated for now
-        required: false
+        type: string
+        list: true           # ← this works with YAML extension
+        help: "Add one topic per line (e.g., Hadith, Seerah, Tafsir)"
+        items:
+          type: string
+      
       - name: type
         label: Type
         type: select
@@ -39,11 +51,15 @@ content:
           - article
           - translation
         default: message
+        help: "The nature of the post"
+      
       - name: edited
-        label: Edited
+        label: Last Edited (optional)
         type: string
-        required: false
-      - name: body            # body is now a regular field (inside fields)
-        label: Body
-        type: markdown        # or 'text' – both work in YAML
+        help: "ISO format (e.g., 2026-04-03T20:32:00)"
+      
+      - name: body
+        label: Content
+        type: rich-text       # ← WYSIWYG editor (easier for non‑tech)
         required: true
+        help: "Write the main content here. You can use bold, italic, lists, etc."
