@@ -1,18 +1,18 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Hero from '../components/Hero.astro';
-import TopicCloud from '../components/TopicCloud.astro';
-import PostCard from '../components/PostCard.astro';
-import { getCollection } from 'astro:content';
+import Layout from "../layouts/Layout.astro";
+import Hero from "../components/Hero.astro";
+import TopicCloud from "../components/TopicCloud.astro";
+import PostCard from "../components/PostCard.astro";
+import { getCollection } from "astro:content";
 
-const allPosts = await getCollection('posts');
+const allPosts = await getCollection("posts");
 
 // Separate index posts from regular posts
-const indexPosts = allPosts.filter(p => p.data.isIndex === true);
-const regularPosts = allPosts.filter(p => p.data.isIndex !== true);
+const indexPosts = allPosts.filter((p) => p.data.isIndex === true);
+const regularPosts = allPosts.filter((p) => p.data.isIndex !== true);
 
-const sortedPosts = regularPosts.toSorted((a, b) =>
-  new Date(b.data.date) - new Date(a.data.date)
+const sortedPosts = regularPosts.toSorted(
+  (a, b) => new Date(b.data.date) - new Date(a.data.date),
 );
 
 const topicMap = new Map();
@@ -27,28 +27,28 @@ const topics = Array.from(topicMap.entries())
   .slice(0, 12);
 
 function stripMarkdown(text: string): string {
-  if (!text) return '';
+  if (!text) return "";
   return text
-    .replace(/\*\*(.*?)\*\*/g, '$1')
-    .replace(/\*(.*?)\*/g, '$1')
-    .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-    .replace(/`(.*?)`/g, '$1')
-    .replace(/#{1,6}\s/g, '')
-    .replace(/>\s/g, '')
-    .replace(/\n/g, ' ')
-    .replace(/\s+/g, ' ')
+    .replace(/\*\*(.*?)\*\*/g, "$1")
+    .replace(/\*(.*?)\*/g, "$1")
+    .replace(/\[(.*?)\]\(.*?\)/g, "$1")
+    .replace(/`(.*?)`/g, "$1")
+    .replace(/#{1,6}\s/g, "")
+    .replace(/>\s/g, "")
+    .replace(/\n/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 }
 
 function getExcerpt(body: string, maxLength = 130) {
   const clean = stripMarkdown(body);
-  return clean.length <= maxLength ? clean : clean.slice(0, maxLength) + '…';
+  return clean.length <= maxLength ? clean : clean.slice(0, maxLength) + "…";
 }
 
-const searchIndex = allPosts.map(post => ({
+const searchIndex = allPosts.map((post) => ({
   id: post.id,
   title: post.data.title,
-  excerpt: getExcerpt(post.data.body || '', 200),
+  excerpt: getExcerpt(post.data.body || "", 200),
   topics: post.data.topics || [],
 }));
 ---
@@ -57,33 +57,37 @@ const searchIndex = allPosts.map(post => ({
   <Hero totalPosts={allPosts.length} totalTopics={topicMap.size} />
   <TopicCloud topics={topics} />
 
+  <div id="search-container" data-index={JSON.stringify(searchIndex)}></div>
+
   <!-- Resources / Indexes Section -->
-  {indexPosts.length > 0 && (
-    <section class="resources-section">
-      <div class="container">
-        <div class="section-hd">
-          <h2 class="section-title">📚 Guides & Resources</h2>
-          <span style="font-size:0.8125rem;color:var(--text-light);">
-            Curated indexes to help you navigate
-          </span>
+  {
+    indexPosts.length > 0 && (
+      <section class="resources-section" id="resources-section">
+        <div class="container">
+          <div class="section-hd">
+            <h2 class="section-title">📚 Guides & Resources</h2>
+            <span style="font-size:0.8125rem;color:var(--text-light);">
+              Curated indexes to help you navigate
+            </span>
+          </div>
+          <div class="resources-grid">
+            {indexPosts.map((post) => (
+              <a href={`/posts/${post.id}`} class="resource-card">
+                <div class="resource-icon">📖</div>
+                <h3 class="resource-title">{post.data.title}</h3>
+                <p class="resource-desc">
+                  {post.data.topics && post.data.topics.length > 0
+                    ? `Topics: ${post.data.topics.join(", ")}`
+                    : "A curated collection of posts"}
+                </p>
+                <span class="resource-link">Explore →</span>
+              </a>
+            ))}
+          </div>
         </div>
-        <div class="resources-grid">
-          {indexPosts.map((post) => (
-            <a href={`/posts/${post.id}`} class="resource-card">
-              <div class="resource-icon">📖</div>
-              <h3 class="resource-title">{post.data.title}</h3>
-              <p class="resource-desc">
-                {post.data.topics && post.data.topics.length > 0
-                  ? `Topics: ${post.data.topics.join(', ')}`
-                  : 'A curated collection of posts'}
-              </p>
-              <span class="resource-link">Explore →</span>
-            </a>
-          ))}
-        </div>
-      </div>
-    </section>
-  )}
+      </section>
+    )
+  }
 
   <!-- Main Posts Section -->
   <div class="posts-section">
@@ -93,113 +97,148 @@ const searchIndex = allPosts.map(post => ({
         <a href="/topics" class="section-link">Browse all →</a>
       </div>
 
-      <div id="search-container" data-index={JSON.stringify(searchIndex)}>
-        <div id="search-results" style="display: none;"></div>
-      </div>
-
       <div id="all-posts">
         <div class="posts-grid">
-          {sortedPosts.slice(0, 7).map((post) => (
-            <PostCard
-              id={post.id}
-              title={post.data.title}
-              date={post.data.date}
-              topics={post.data.topics}
-              excerpt={getExcerpt(post.data.body || '')}
-              featured={post === sortedPosts[0]}
-            />
-          ))}
+          {
+            sortedPosts
+              .slice(0, 7)
+              .map((post) => (
+                <PostCard
+                  id={post.id}
+                  title={post.data.title}
+                  date={post.data.date}
+                  topics={post.data.topics}
+                  excerpt={getExcerpt(post.data.body || "")}
+                  featured={post === sortedPosts[0]}
+                />
+              ))
+          }
         </div>
       </div>
     </div>
   </div>
 
   <script type="module">
-    import Fuse from 'fuse.js';
+    import Fuse from "fuse.js";
 
-    (function() {
-      const container = document.getElementById('search-container');
+    (function () {
+      const container = document.getElementById("search-container");
       if (!container) return;
-      const searchIndex = JSON.parse(container.dataset.index || '[]');
+      const searchIndex = JSON.parse(container.dataset.index || "[]");
 
-      const searchInput = document.querySelector('.hero-search input');
+      const searchInput = document.querySelector(".hero-search input");
       if (!searchInput) return;
+
+      // Create dropdown and attach to body
+      const dropdown = document.createElement("div");
+      dropdown.className = "search-dropdown";
+      dropdown.hidden = true;
+      document.body.appendChild(dropdown);
 
       let fuse = null;
       let debounceTimer;
-      const resultsContainer = document.getElementById('search-results');
-      const allPostsContainer = document.getElementById('all-posts');
 
       function esc(str) {
-        if (!str) return '';
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        if (!str) return "";
+        return str
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function close() {
+        dropdown.innerHTML = "";
+        dropdown.hidden = true;
+      }
+
+      function positionDropdown() {
+        const rect = searchInput.getBoundingClientRect();
+        dropdown.style.position = "fixed";
+        dropdown.style.top = rect.bottom + 6 + "px";
+        dropdown.style.left = rect.left + "px";
+        dropdown.style.width = Math.min(rect.width, 600) + "px";
+        dropdown.style.maxWidth = "600px";
       }
 
       function renderResults(query) {
         const trimmed = query.trim();
         if (!trimmed) {
-          allPostsContainer.style.display = 'block';
-          resultsContainer.style.display = 'none';
-          resultsContainer.innerHTML = '';
+          close();
           return;
         }
 
         if (!fuse) {
           fuse = new Fuse(searchIndex, {
-            keys: ['title', 'excerpt', 'topics'],
+            keys: [
+              { name: "title", weight: 0.7 },
+              { name: "topics", weight: 0.2 },
+              { name: "excerpt", weight: 0.1 },
+            ],
             threshold: 0.3,
+            ignoreLocation: true,
+            minMatchCharLength: 2,
           });
         }
 
-        const results = fuse.search(trimmed);
-        allPostsContainer.style.display = 'none';
-        resultsContainer.style.display = 'block';
+        const results = fuse.search(trimmed).slice(0, 8);
+        dropdown.hidden = false;
+        positionDropdown();
 
         if (results.length === 0) {
-          resultsContainer.innerHTML = `<p class="search-empty">No results found for "<strong>${esc(trimmed)}</strong>".</p>`;
+          dropdown.innerHTML = `<p class="drop-empty">No results for "<strong>${esc(trimmed)}</strong>"</p>`;
           return;
         }
 
-        const grid = document.createElement('div');
-        grid.className = 'posts-grid';
-
-        results.forEach(({ item }) => {
-          const wrapper = document.createElement('a');
-          wrapper.href = `/posts/${item.id}`;
-          wrapper.className = 'post-card-link';
-
-          const topicTag = item.topics.length > 0
-            ? `<span class="card-topic-tag">${esc(item.topics[0])}</span>`
-            : '';
-
-          wrapper.innerHTML = `
-            <article class="post-card">
-              <div class="card-bar"></div>
-              <div class="card-body">
-                <div class="card-meta">${topicTag}</div>
-                <h3 class="card-title">${esc(item.title)}</h3>
-                <p class="card-excerpt">${esc(item.excerpt)}</p>
-                <div class="card-footer">
-                  <span class="card-cta">Read <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-                </div>
-              </div>
-            </article>
-          `;
-          grid.appendChild(wrapper);
-        });
-
-        resultsContainer.innerHTML = '';
-        resultsContainer.appendChild(grid);
+        dropdown.innerHTML = results
+          .map(
+            ({ item }) => `
+          <a href="/posts/${item.id}" class="drop-item">
+            ${item.topics[0] ? `<span class="drop-topic">${esc(item.topics[0])}</span>` : ""}
+            <span class="drop-title">${esc(item.title)}</span>
+            <span class="drop-excerpt">${esc(item.excerpt)}</span>
+          </a>
+        `,
+          )
+          .join("");
       }
 
-      searchInput.addEventListener('input', (e) => {
+      // Event listeners
+      searchInput.addEventListener("input", (e) => {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => renderResults(e.target.value), 200);
+        debounceTimer = setTimeout(() => renderResults(e.target.value), 180);
       });
 
-      const form = document.querySelector('.hero-search');
+      searchInput.addEventListener("focus", () => {
+        if (searchInput.value.trim()) {
+          renderResults(searchInput.value);
+        }
+      });
+
+      // Reposition on scroll/resize to keep dropdown aligned
+      window.addEventListener("scroll", () => {
+        if (!dropdown.hidden) positionDropdown();
+      });
+      window.addEventListener("resize", () => {
+        if (!dropdown.hidden) positionDropdown();
+      });
+
+      // Click outside to close
+      document.addEventListener("click", (e) => {
+        if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+          close();
+        }
+      });
+
+      // Escape key to close
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") close();
+      });
+
+      // Prevent form submission from reloading
+      const form = document.querySelector(".hero-search");
       if (form) {
-        form.addEventListener('submit', (e) => {
+        form.addEventListener("submit", (e) => {
           e.preventDefault();
           renderResults(searchInput.value);
         });
@@ -209,23 +248,80 @@ const searchIndex = allPosts.map(post => ({
 </Layout>
 
 <style>
-  .posts-section { padding: 2.5rem 0 3rem; }
+  .posts-section {
+    padding: 2.5rem 0 3rem;
+  }
   .posts-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.125rem;
     width: 100%;
   }
-  .search-empty, .search-loading {
-    text-align: center;
-    color: var(--text-light);
-    padding: 2rem 0;
-    font-size: 1.1rem;
-  }
   .post-card-link {
     text-decoration: none;
     display: block;
     max-width: 100%;
+  }
+
+  /* ===== DROPDOWN SEARCH STYLES (global) ===== */
+  :global(.search-dropdown) {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    z-index: 9999;
+    max-height: 60vh;
+    overflow-y: auto;
+    min-width: 200px;
+    padding: 0.25rem 0;
+  }
+  :global(.search-dropdown[hidden]) {
+    display: none;
+  }
+
+  :global(.drop-item) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.6rem 1rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+  :global(.drop-item:last-child) {
+    border-bottom: none;
+  }
+  :global(.drop-item:hover) {
+    background: var(--light-gold);
+  }
+
+  :global(.drop-topic) {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+  }
+  :global(.drop-title) {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--primary);
+    line-height: 1.3;
+  }
+  :global(.drop-excerpt) {
+    font-size: 0.775rem;
+    color: var(--text-light);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  :global(.drop-empty) {
+    padding: 1rem;
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.875rem;
   }
 
   /* Resources Section */
@@ -246,14 +342,17 @@ const searchIndex = allPosts.map(post => ({
     border-radius: var(--radius);
     padding: 1.5rem;
     text-decoration: none;
-    transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
+    transition:
+      transform 0.22s,
+      box-shadow 0.22s,
+      border-color 0.22s;
     display: flex;
     flex-direction: column;
   }
   .resource-card:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-hover);
-    border-color: rgba(201,168,76,0.3);
+    border-color: rgba(201, 168, 76, 0.3);
   }
   .resource-icon {
     font-size: 1.625rem;
