@@ -49,8 +49,7 @@ content:
         label: Edited
         type: datetime
         required: false
-    # Body goes here – outside fields
-    body:
-      label: Body
-      type: markdown
-      required: true
+      - name: body           # ← body INSIDE fields
+        label: Body
+        type: rich-text      # or 'markdown'
+        required: true
