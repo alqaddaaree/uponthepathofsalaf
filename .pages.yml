@@ -1,15 +1,18 @@
-site:
-  title: "The Salaf's Path"
-  description: "Islamic content from the Salaf"
-
 content:
   - name: posts
     label: Posts
     type: collection
     path: src/content/posts
-    format: frontmatter
+    format: frontmatter    # ← this tells PageCMS these are .md files with frontmatter
     create: true
     delete: true
+    
+    # Body goes HERE – outside fields
+    body:
+      label: Body
+      type: markdown
+      required: true
+    
     fields:
       - name: id
         label: ID
@@ -21,7 +24,7 @@ content:
         required: true
       - name: date
         label: Date
-        type: string        # ← changed from datetime
+        type: string
         required: true
       - name: author
         label: Author
@@ -33,10 +36,8 @@ content:
         required: false
       - name: topics
         label: Topics
-        type: string        # ← changed from list
+        type: string        # comma-separated for now
         required: false
-        # For now, enter topics as a comma-separated list in a single text field.
-        # Example: "Hadith, Scholars, Seerah"
       - name: type
         label: Type
         type: select
@@ -47,9 +48,5 @@ content:
         default: message
       - name: edited
         label: Edited
-        type: string        # ← changed from datetime
+        type: string
         required: false
-      - name: body
-        label: Body
-        type: markdown      # ← or rich-text – both work
-        required: true
