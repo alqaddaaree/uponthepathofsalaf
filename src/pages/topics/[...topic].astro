@@ -89,8 +89,6 @@ function getExcerpt(body: string, maxLength = 130) {
               id={post.id}
               title={post.data.title}
               date={post.data.date}
-              author={post.data.author ?? undefined}
-              quotedAuthor={post.data.quotedAuthor ?? undefined}
               topics={post.data.topics}
               excerpt={getExcerpt(post.data.body)}
             />

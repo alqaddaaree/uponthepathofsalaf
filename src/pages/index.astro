@@ -45,7 +45,6 @@ const searchIndex = allPosts.map(post => ({
   title: post.data.title,
   excerpt: getExcerpt(post.data.body || '', 200),
   topics: post.data.topics || [],
-  author: post.data.author || post.data.quotedAuthor || '',
 }));
 ---
 
@@ -71,8 +70,6 @@ const searchIndex = allPosts.map(post => ({
               id={post.id}                     // use slug
               title={post.data.title}
               date={post.data.date}
-              author={post.data.author ?? undefined}
-              quotedAuthor={post.data.quotedAuthor ?? undefined}
               topics={post.data.topics}
               excerpt={getExcerpt(post.data.body || '')}
               featured={post === sortedPosts[0]}
@@ -115,7 +112,7 @@ const searchIndex = allPosts.map(post => ({
 
         if (!fuse) {
           fuse = new Fuse(searchIndex, {
-            keys: ['title', 'excerpt', 'topics', 'author'],
+            keys: ['title', 'excerpt', 'topics'],
             threshold: 0.3,
           });
         }
@@ -140,9 +137,6 @@ const searchIndex = allPosts.map(post => ({
           const topicTag = item.topics.length > 0
             ? `<span class="card-topic-tag">${esc(item.topics[0])}</span>`
             : '';
-          const authorHTML = item.author
-            ? `<span class="card-author">${esc(item.author)}</span>`
-            : '';
 
           wrapper.innerHTML = `
             <article class="post-card">
@@ -152,7 +146,6 @@ const searchIndex = allPosts.map(post => ({
                 <h3 class="card-title">${esc(item.title)}</h3>
                 <p class="card-excerpt">${esc(item.excerpt)}</p>
                 <div class="card-footer">
-                  ${authorHTML}
                   <span class="card-cta">Read <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
                 </div>
               </div>

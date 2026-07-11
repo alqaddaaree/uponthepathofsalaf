@@ -6,14 +6,12 @@ export interface Props {
   id: number;
   title: string;
   date: string;
-  author?: string | null;
-  quotedAuthor?: string | null;
   topics?: string[];
   excerpt?: string;
   featured?: boolean;
 }
 
-const { id, title, date, author, quotedAuthor, topics = [], excerpt, featured = false } = Astro.props;
+const { id, title, date, topics = [], excerpt, featured = false } = Astro.props;
 
 // Format date for display
 const formattedDate = new Date(date).toLocaleDateString('en-US', {
@@ -22,14 +20,11 @@ const formattedDate = new Date(date).toLocaleDateString('en-US', {
   day: 'numeric',
 });
 
-const displayAuthor = quotedAuthor || author;
-
 const cardData = {
   id,
   title,
   excerpt: excerpt || '',
   topics,
-  author: displayAuthor || undefined,
   date: formattedDate,
   featured,
   url: `/posts/${id}`,

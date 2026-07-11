@@ -21,14 +21,6 @@ content:
         label: Date
         type: string
         required: true
-      - name: author
-        label: Author
-        type: string
-        required: false
-      - name: quotedAuthor
-        label: Quoted Author
-        type: string
-        required: false
       - name: topics
         label: Topics
         type: relation          # ← links to the topics collection
