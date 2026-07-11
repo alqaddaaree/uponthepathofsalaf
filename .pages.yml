@@ -10,46 +10,33 @@ content:
     format: frontmatter
     create: true
     delete: true
-    
-    # Body goes here, not inside fields
-    body:
-      label: Body
-      type: markdown
-      required: true
-    
     fields:
       - name: id
         label: ID
-        type: string         # changed from number
+        type: string          # ← string, not number
         required: true
-        
       - name: title
         label: Title
         type: string
         required: true
-        
       - name: date
         label: Date
         type: datetime
         required: true
-        
       - name: author
         label: Author
         type: string
         required: false
-        
       - name: quotedAuthor
         label: Quoted Author
         type: string
         required: false
-        
       - name: topics
         label: Topics
         type: list
         default: []
         items:
           type: string
-        
       - name: type
         label: Type
         type: select
@@ -58,8 +45,11 @@ content:
           - article
           - translation
         default: message
-      
       - name: edited
         label: Edited
         type: datetime
         required: false
+      - name: body
+        label: Body
+        type: markdown      # ← inside fields, NOT outside
+        required: true
