@@ -4,48 +4,7 @@ site:
   description: "Islamic content from the Salaf"
 
 content:
-  # ---- POSTS COLLECTION ----
-  - name: posts
-    label: Posts
-    type: collection
-    path: src/content/posts
-    extension: yaml
-    create: true
-    delete: true
-    fields:
-      - name: title
-        label: Title
-        type: string
-        required: true
-      - name: date
-        label: Date
-        type: string
-        required: true
-      - name: topics
-        label: Topics
-        type: relation          # ← links to the topics collection
-        collection: topics
-        multiple: true
-        display: name           # shows topic name in the dropdown
-        required: false
-      - name: type
-        label: Type
-        type: select
-        options:
-          - message
-          - article
-          - translation
-        default: message
-      - name: edited
-        label: Edited
-        type: string
-        required: false
-      - name: body
-        label: Content
-        type: rich-text
-        required: true
-
-  # ---- TOPICS COLLECTION ----
+  # ---- TOPICS COLLECTION (moved first) ----
   - name: topics
     label: Topics
     type: collection
@@ -78,3 +37,40 @@ content:
         default: 999
         required: false
         help: "Lower numbers appear first"
+
+  # ---- POSTS COLLECTION ----
+  - name: posts
+    label: Posts
+    type: collection
+    path: src/content/posts
+    extension: yaml
+    create: true
+    delete: true
+    fields:
+      - name: title
+        label: Title
+        type: string
+        required: true
+      - name: date
+        label: Date
+        type: string
+        required: true
+      - name: topics
+        label: Topics
+        type: relation
+        collection: topics
+        multiple: true
+        display: name
+        required: false
+      - name: type
+        label: Type
+        type: select
+        options:
+          - message
+          - article
+          - translation
+        default: message
+      - name: body
+        label: Content
+        type: rich-text
+        required: true
