@@ -2,9 +2,8 @@ import { defineCollection, z } from 'astro:content';
 import { glob } from 'astro/loaders';
 
 const postsCollection = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/posts' }),
+  loader: glob({ pattern: '**/*.yaml', base: './src/content/posts' }),
   schema: z.object({
-    id: z.string(),
     title: z.string(),
     date: z.string(),
     author: z.string().nullable().optional(),
@@ -15,6 +14,7 @@ const postsCollection = defineCollection({
     forwarded_from: z.string().nullable().optional(),
     has_audio: z.boolean().default(false),
     has_file: z.boolean().default(false),
+    body: z.string().optional(),    // ← add this
   }),
 });
 

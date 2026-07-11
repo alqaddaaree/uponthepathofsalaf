@@ -2,44 +2,45 @@
 import Layout from '../../layouts/Layout.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getCollection } from 'astro:content';
+import MarkdownIt from 'markdown-it';
 
-const modules = import.meta.glob('../../content/posts/*.md', { eager: true });
-const allPostModules = Object.values(modules).map((mod: any) => ({
-  default: mod.default,
-  frontmatter: mod.frontmatter,
-}));
+const md = new MarkdownIt({
+  html: true,
+  linkify: true,
+});
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
   return posts.map((post) => ({
-    params: { id: String(post.data.id) },
-    props: { id: post.data.id },
+    params: { id: post.id },
   }));
 }
 
-const { id } = Astro.props;
-const postEntry = allPostModules.find((p) => p.frontmatter.id === id);
+const { id } = Astro.params;
+const allPosts = await getCollection('posts');
+const postEntry = allPosts.find((p) => p.id === id);
 
 if (!postEntry) {
   return Astro.redirect('/');
 }
 
-const { default: Content, frontmatter } = postEntry;
+const { data } = postEntry;
+const bodyHtml = md.render(data.body || '');
 
-const formattedDate = new Date(frontmatter.date).toLocaleDateString('en-US', {
+const formattedDate = new Date(data.date).toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
 });
 
-const allPosts = await getCollection('posts');
 const relatedPosts = allPosts
-  .filter((p) => p.data.id !== frontmatter.id)
-  .filter((p) => p.data.topics?.some((t) => frontmatter.topics?.includes(t)))
+  .filter((p) => p.id !== postEntry.id)
+  .filter((p) => p.data.topics?.some((t) => data.topics?.includes(t)))
   .sort((a, b) => new Date(b.data.date) - new Date(a.data.date))
   .slice(0, 2);
 
 function stripMarkdown(text: string): string {
+  if (!text) return '';
   return text
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/\*(.*?)\*/g, '$1')
@@ -59,26 +60,27 @@ function getExcerpt(body: string, maxLength = 130) {
 }
 ---
 
-<Layout title={`${frontmatter.title} | The Salaf's Path`}>
+<Layout title={`${data.title} | The Salaf's Path`}>
   <article class="post-detail">
+    <!-- breadcrumb, topic pill, title, meta bar (unchanged) -->
     <nav class="breadcrumb">
       <a href="/">Home</a>
       <span>/</span>
-      {frontmatter.topics && frontmatter.topics.length > 0 && (
+      {data.topics && data.topics.length > 0 && (
         <>
-          <a href={`/topics/${frontmatter.topics[0].toLowerCase()}`}>
-            {frontmatter.topics[0]}
+          <a href={`/topics/${data.topics[0].toLowerCase()}`}>
+            {data.topics[0]}
           </a>
           <span>/</span>
         </>
       )}
-      <span style="color:var(--text);">{frontmatter.title}</span>
+      <span style="color:var(--text);">{data.title}</span>
     </nav>
 
-    {frontmatter.topics && frontmatter.topics.length > 0 && (
-      <div class="post-topic-pill">{frontmatter.topics.join(' · ')}</div>
+    {data.topics && data.topics.length > 0 && (
+      <div class="post-topic-pill">{data.topics.join(' · ')}</div>
     )}
-    <h1 class="post-main-title">{frontmatter.title}</h1>
+    <h1 class="post-main-title">{data.title}</h1>
 
     <div class="post-meta-bar">
       <div class="meta-item">
@@ -87,15 +89,15 @@ function getExcerpt(body: string, maxLength = 130) {
         </svg>
         {formattedDate}
       </div>
-      {(frontmatter.author || frontmatter.quotedAuthor) && (
+      {(data.author || data.quotedAuthor) && (
         <div class="meta-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
           </svg>
-          {frontmatter.quotedAuthor || frontmatter.author}
+          {data.quotedAuthor || data.author}
         </div>
       )}
-      {frontmatter.edited && (
+      {data.edited && (
         <div class="meta-item">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
@@ -105,14 +107,12 @@ function getExcerpt(body: string, maxLength = 130) {
       )}
     </div>
 
-    <!-- Post Body - JavaScript will apply dir to each paragraph/block -->
-    <div class="post-body">
-      <Content />
-    </div>
+    <!-- Render body as HTML -->
+    <div class="post-body" set:html={bodyHtml} />
 
-    {frontmatter.topics && frontmatter.topics.length > 0 && (
+    {data.topics && data.topics.length > 0 && (
       <div class="post-tags">
-        {frontmatter.topics.map((topic: string) => (
+        {data.topics.map((topic: string) => (
           <a href={`/topics/${topic.toLowerCase()}`} class="tag">#{topic}</a>
         ))}
       </div>
@@ -134,13 +134,13 @@ function getExcerpt(body: string, maxLength = 130) {
         <div class="related-grid">
           {relatedPosts.map((p) => (
             <PostCard
-              id={p.data.id}
+              id={p.id}
               title={p.data.title}
               date={p.data.date}
               author={p.data.author ?? undefined}
               quotedAuthor={p.data.quotedAuthor ?? undefined}
               topics={p.data.topics}
-              excerpt={getExcerpt(p.body)}
+              excerpt={getExcerpt(p.data.body || '')}
             />
           ))}
         </div>
@@ -154,6 +154,7 @@ function getExcerpt(body: string, maxLength = 130) {
 </Layout>
 
 <style>
+  /* ⬇️ THIS MUST BE INCLUDED – it styles the post detail page */
   .post-detail { max-width: 720px; margin: 0 auto; padding: 2.5rem 0 4rem; }
   
   .breadcrumb {
@@ -218,7 +219,6 @@ function getExcerpt(body: string, maxLength = 130) {
     word-wrap: break-word;
   }
   
-  /* Each paragraph/block will get its own direction via JavaScript */
   .post-body p, .post-body blockquote, .post-body h1, .post-body h2, .post-body h3, .post-body h4, .post-body li {
     font-family: var(--font-english), var(--font-arabic);
   }
@@ -244,7 +244,6 @@ function getExcerpt(body: string, maxLength = 130) {
     font-weight: 600;
   }
 
-  /* RTL blockquotes */
   .post-body blockquote[dir="rtl"] {
     border-left: none;
     border-right: 4px solid var(--accent);
@@ -284,6 +283,7 @@ function getExcerpt(body: string, maxLength = 130) {
     .post-body blockquote { padding: 0.8rem 1rem; }
   }
 </style>
+
 <script>
   document.querySelectorAll('.post-body p, .post-body blockquote, .post-body h1, .post-body h2, .post-body h3, .post-body h4, .post-body li')
     .forEach(el => el.dir = 'auto');

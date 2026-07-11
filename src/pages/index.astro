@@ -22,6 +22,7 @@ const topics = Array.from(topicMap.entries())
   .slice(0, 12);
 
 function stripMarkdown(text: string): string {
+  if (!text) return '';
   return text
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/\*(.*?)\*/g, '$1')
@@ -40,9 +41,9 @@ function getExcerpt(body: string, maxLength = 130) {
 }
 
 const searchIndex = allPosts.map(post => ({
-  id: post.data.id,
+  id: post.id,                    // use slug as identifier
   title: post.data.title,
-  excerpt: getExcerpt(post.body, 200),
+  excerpt: getExcerpt(post.data.body || '', 200),
   topics: post.data.topics || [],
   author: post.data.author || post.data.quotedAuthor || '',
 }));
@@ -59,7 +60,6 @@ const searchIndex = allPosts.map(post => ({
         <a href="/topics" class="section-link">Browse all →</a>
       </div>
 
-      <!-- Container with data index for search -->
       <div id="search-container" data-index={JSON.stringify(searchIndex)}>
         <div id="search-results" style="display: none;"></div>
       </div>
@@ -68,13 +68,13 @@ const searchIndex = allPosts.map(post => ({
         <div class="posts-grid">
           {sortedPosts.slice(0, 7).map((post) => (
             <PostCard
-              id={post.data.id}
+              id={post.id}                     // use slug
               title={post.data.title}
               date={post.data.date}
               author={post.data.author ?? undefined}
               quotedAuthor={post.data.quotedAuthor ?? undefined}
               topics={post.data.topics}
-              excerpt={getExcerpt(post.body)}
+              excerpt={getExcerpt(post.data.body || '')}
               featured={post === sortedPosts[0]}
             />
           ))}
@@ -134,7 +134,7 @@ const searchIndex = allPosts.map(post => ({
 
         results.forEach(({ item }) => {
           const wrapper = document.createElement('a');
-          wrapper.href = `/posts/${item.id}`;
+          wrapper.href = `/posts/${item.id}`;  // link uses slug
           wrapper.className = 'post-card-link';
 
           const topicTag = item.topics.length > 0
@@ -187,7 +187,7 @@ const searchIndex = allPosts.map(post => ({
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.125rem;
-    width: 100%;               /* ensure it fills container */
+    width: 100%;
   }
   .search-empty, .search-loading {
     text-align: center;
@@ -198,10 +198,9 @@ const searchIndex = allPosts.map(post => ({
   .post-card-link {
     text-decoration: none;
     display: block;
-    max-width: 100%;           /* constrain link to grid cell */
+    max-width: 100%;
   }
 
-  /* Responsive */
   @media (max-width: 900px) {
     .posts-grid {
       grid-template-columns: repeat(2, 1fr);
