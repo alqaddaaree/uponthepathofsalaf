@@ -5,20 +5,12 @@ import TopicCloud from '../components/TopicCloud.astro';
 import PostCard from '../components/PostCard.astro';
 import { getCollection } from 'astro:content';
 
-// Get all posts
 const allPosts = await getCollection('posts');
-
-// Sort by date (newest first)
-const sortedPosts = allPosts.sort((a, b) =>
+const sortedPosts = allPosts.toSorted((a, b) =>
   new Date(b.data.date) - new Date(a.data.date)
 );
 
-// Featured post (first one for now)
-const featuredPost = sortedPosts[0] || null;
-const restPosts = sortedPosts.slice(1, 7); // Show 6 more
-
-// Build topic counts
-const topicMap = new Map<string, number>();
+const topicMap = new Map();
 for (const post of allPosts) {
   for (const topic of post.data.topics || []) {
     topicMap.set(topic, (topicMap.get(topic) || 0) + 1);
@@ -29,7 +21,6 @@ const topics = Array.from(topicMap.entries())
   .sort((a, b) => b.count - a.count)
   .slice(0, 12);
 
-// Strip markdown for excerpts
 function stripMarkdown(text: string): string {
   return text
     .replace(/\*\*(.*?)\*\*/g, '$1')
@@ -45,57 +36,149 @@ function stripMarkdown(text: string): string {
 
 function getExcerpt(body: string, maxLength = 130) {
   const clean = stripMarkdown(body);
-  if (clean.length <= maxLength) return clean;
-  return clean.slice(0, maxLength) + '…';
+  return clean.length <= maxLength ? clean : clean.slice(0, maxLength) + '…';
 }
+
+const searchIndex = allPosts.map(post => ({
+  id: post.data.id,
+  title: post.data.title,
+  excerpt: getExcerpt(post.body, 200),
+  topics: post.data.topics || [],
+  author: post.data.author || post.data.quotedAuthor || '',
+}));
 ---
 
 <Layout title="Home | The Salaf's Path">
   <Hero totalPosts={allPosts.length} totalTopics={topicMap.size} />
-
   <TopicCloud topics={topics} />
 
   <div class="posts-section">
     <div class="container">
       <div class="section-hd">
         <h2 class="section-title">Recent Lessons</h2>
-        <a href="/topics" class="section-link">View all →</a>
+        <a href="/topics" class="section-link">Browse all →</a>
       </div>
 
-      <div class="posts-grid">
-        {featuredPost && (
-          <PostCard
-            id={featuredPost.data.id}
-            title={featuredPost.data.title}
-            date={featuredPost.data.date}
-            author={featuredPost.data.author ?? undefined}
-            quotedAuthor={featuredPost.data.quotedAuthor ?? undefined}
-            topics={featuredPost.data.topics}
-            excerpt={getExcerpt(featuredPost.body)}
-            featured={true}
-          />
-        )}
-
-        {restPosts.map((post) => (
-          <PostCard
-            id={post.data.id}
-            title={post.data.title}
-            date={post.data.date}
-            author={post.data.author ?? undefined}
-            quotedAuthor={post.data.quotedAuthor ?? undefined}
-            topics={post.data.topics}
-            excerpt={getExcerpt(post.body)}
-          />
-        ))}
+      <!-- Container with data index for search -->
+      <div id="search-container" data-index={JSON.stringify(searchIndex)}>
+        <div id="search-results" style="display: none;"></div>
       </div>
 
-      {allPosts.length > 7 && (
-        <div class="load-more-wrap">
-          <a href="/topics" class="btn-load-more">Load More Lessons</a>
+      <div id="all-posts">
+        <div class="posts-grid">
+          {sortedPosts.slice(0, 7).map((post) => (
+            <PostCard
+              id={post.data.id}
+              title={post.data.title}
+              date={post.data.date}
+              author={post.data.author ?? undefined}
+              quotedAuthor={post.data.quotedAuthor ?? undefined}
+              topics={post.data.topics}
+              excerpt={getExcerpt(post.body)}
+              featured={post === sortedPosts[0]}
+            />
+          ))}
         </div>
-      )}
+      </div>
     </div>
   </div>
+
+  <script type="module">
+    import Fuse from 'fuse.js';
+
+    (function() {
+      const container = document.getElementById('search-container');
+      if (!container) return;
+      const searchIndex = JSON.parse(container.dataset.index || '[]');
+
+      const searchInput = document.querySelector('.hero-search input');
+      if (!searchInput) return;
+
+      let fuse = null;
+      let debounceTimer;
+      const resultsContainer = document.getElementById('search-results');
+      const allPostsContainer = document.getElementById('all-posts');
+
+      function esc(str) {
+        if (!str) return '';
+        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      }
+
+      function renderResults(query) {
+        const trimmed = query.trim();
+        if (!trimmed) {
+          allPostsContainer.style.display = 'block';
+          resultsContainer.style.display = 'none';
+          resultsContainer.innerHTML = '';
+          return;
+        }
+
+        if (!fuse) {
+          fuse = new Fuse(searchIndex, {
+            keys: ['title', 'excerpt', 'topics', 'author'],
+            threshold: 0.3,
+          });
+        }
+
+        const results = fuse.search(trimmed);
+        allPostsContainer.style.display = 'none';
+        resultsContainer.style.display = 'block';
+
+        if (results.length === 0) {
+          resultsContainer.innerHTML = `<p class="search-empty">No results found for "<strong>${esc(trimmed)}</strong>".</p>`;
+          return;
+        }
+
+        const grid = document.createElement('div');
+        grid.className = 'posts-grid';
+
+        results.forEach(({ item }) => {
+          const wrapper = document.createElement('a');
+          wrapper.href = `/posts/${item.id}`;
+          wrapper.className = 'post-card-link';
+
+          const topicTag = item.topics.length > 0
+            ? `<span class="card-topic-tag">${esc(item.topics[0])}</span>`
+            : '';
+          const authorHTML = item.author
+            ? `<span class="card-author">${esc(item.author)}</span>`
+            : '';
+
+          wrapper.innerHTML = `
+            <article class="post-card">
+              <div class="card-bar"></div>
+              <div class="card-body">
+                <div class="card-meta">${topicTag}</div>
+                <h3 class="card-title">${esc(item.title)}</h3>
+                <p class="card-excerpt">${esc(item.excerpt)}</p>
+                <div class="card-footer">
+                  ${authorHTML}
+                  <span class="card-cta">Read <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+                </div>
+              </div>
+            </article>
+          `;
+          grid.appendChild(wrapper);
+        });
+
+        resultsContainer.innerHTML = '';
+        resultsContainer.appendChild(grid);
+      }
+
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => renderResults(e.target.value), 200);
+      });
+
+      const form = document.querySelector('.hero-search');
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          renderResults(searchInput.value);
+        });
+      }
+    })();
+  </script>
 </Layout>
 
 <style>
@@ -105,28 +188,11 @@ function getExcerpt(body: string, maxLength = 130) {
     grid-template-columns: repeat(3, 1fr);
     gap: 1.125rem;
   }
-  .load-more-wrap { text-align: center; margin-top: 2.25rem; }
-  .btn-load-more {
-    display: inline-block;
-    padding: 0.7rem 2.25rem;
-    background: transparent;
-    border: 1.5px solid var(--primary);
-    color: var(--primary);
-    border-radius: 50px;
-    font-family: var(--font-ui);
-    font-size: 0.875rem;
-    font-weight: 600;
-    cursor: pointer;
-    letter-spacing: 0.02em;
-    transition: background 0.18s, color 0.18s;
-    text-decoration: none;
+  .search-empty, .search-loading {
+    text-align: center;
+    color: var(--text-light);
+    padding: 2rem 0;
+    font-size: 1.1rem;
   }
-  .btn-load-more:hover { background: var(--primary); color: #fff; }
-
-  @media (max-width: 1024px) {
-    .posts-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 768px) {
-    .posts-grid { grid-template-columns: 1fr; }
-  }
+  .post-card-link { text-decoration: none; display: block; }
 </style>

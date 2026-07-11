@@ -1,4 +1,7 @@
 ---
+// src/components/PostCard.astro
+import { renderCardHTML } from '../utils/renderCard';
+
 export interface Props {
   id: number;
   title: string;
@@ -12,153 +15,27 @@ export interface Props {
 
 const { id, title, date, author, quotedAuthor, topics = [], excerpt, featured = false } = Astro.props;
 
+// Format date for display
 const formattedDate = new Date(date).toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'short',
   day: 'numeric',
 });
+
 const displayAuthor = quotedAuthor || author;
+
+const cardData = {
+  id,
+  title,
+  excerpt: excerpt || '',
+  topics,
+  author: displayAuthor || undefined,
+  date: formattedDate,
+  featured,
+  url: `/posts/${id}`,
+};
 ---
 
-<article class={`post-card ${featured ? 'featured' : ''}`}>
-  <div class="card-bar"></div>
-  <div class="card-body">
-    <div class="card-meta">
-      {topics.length > 0 && (
-        <span class="card-topic-tag">{topics[0]}</span>
-      )}
-      <span class="card-date">{formattedDate}</span>
-    </div>
-    <a href={`/posts/${id}`} class="card-link">
-      <h3 class="card-title">{title}</h3>
-    </a>
-    {excerpt && <p class="card-excerpt auto-dir">{excerpt}</p>}
-    <div class="card-footer">
-      {displayAuthor && <span class="card-author">{displayAuthor}</span>}
-      <span class="card-cta">
-        Read
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M5 12h14M12 5l7 7-7 7"/>
-        </svg>
-      </span>
-    </div>
-  </div>
-</article>
-
-<style>
-  .post-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    display: flex;
-    overflow: hidden;
-    transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
-  }
-  .post-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-hover);
-    border-color: rgba(201,168,76,0.35);
-  }
-  .card-bar {
-    width: 4px;
-    background: var(--accent);
-    flex-shrink: 0;
-    transition: width 0.18s;
-  }
-  .post-card:hover .card-bar { width: 6px; }
-  .card-body {
-    padding: 1.125rem 1.125rem 1rem 0.875rem;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-width: 0;
-  }
-  .card-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.625rem;
-    flex-wrap: wrap;
-    font-family: var(--font-english);
-  }
-  .card-topic-tag {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    color: var(--accent);
-    background: rgba(201,168,76,0.12);
-    padding: 0.175rem 0.45rem;
-    border-radius: 3px;
-  }
-  .card-date { font-size: 0.72rem; color: var(--text-light); }
-  .card-link { text-decoration: none; }
-  .card-title {
-    font-family: var(--font-title);
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text);
-    line-height: 1.42;
-    margin-bottom: 0.5rem;
-    transition: color 0.15s;
-  }
-  .card-link:hover .card-title { color: var(--primary); }
-  .card-excerpt {
-    font-size: 0.8375rem;
-    color: var(--text-light);
-    line-height: 1.68;
-    flex: 1;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    font-family: var(--font-english), var(--font-arabic);
-  }
-  .card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 0.875rem;
-    padding-top: 0.625rem;
-    border-top: 1px solid var(--border);
-    font-family: var(--font-english);
-  }
-  .card-author { font-size: 0.72rem; color: var(--text-light); font-style: italic; }
-  .card-cta {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: var(--accent);
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-    transition: gap 0.18s;
-  }
-  .post-card:hover .card-cta { gap: 0.45rem; }
-
-  .post-card.featured {
-    background: linear-gradient(105deg, var(--primary) 0%, var(--secondary) 100%);
-    border-color: transparent;
-  }
-  .post-card.featured .card-bar { background: var(--accent); width: 5px; }
-  .post-card.featured .card-title { color: #fff; font-size: 1.2rem; }
-  .post-card.featured .card-excerpt { color: rgba(255,255,255,0.72); -webkit-line-clamp: 2; }
-  .post-card.featured .card-topic-tag {
-    background: rgba(201,168,76,0.18);
-    color: var(--accent);
-  }
-  .post-card.featured .card-date { color: rgba(255,255,255,0.5); }
-  .post-card.featured .card-author { color: rgba(255,255,255,0.55); }
-  .post-card.featured .card-cta { color: var(--accent); }
-  .post-card.featured .card-footer { border-color: rgba(255,255,255,0.12); }
-
-  /* RTL support for card excerpt */
-  [dir="rtl"] .card-excerpt {
-    text-align: right;
-  }
-
-  @media (max-width: 480px) {
-    .card-body { padding: 1rem 1rem 0.8rem 0.75rem; }
-    .card-title { font-size: 0.95rem; }
-    .post-card.featured .card-title { font-size: 1.05rem; }
-  }
-</style>
+<a href={`/posts/${id}`} class="post-card-link">
+  <Fragment set:html={renderCardHTML(cardData)} />
+</a>

@@ -5,26 +5,65 @@ import Footer from '../components/Footer.astro';
 export interface Props {
   title: string;
   description?: string;
+  image?: string;
+  url?: string;
   noIndex?: boolean;
   className?: string;
 }
 
-const { title, description = 'Islamic content from the Salaf', noIndex = false, className = '' } = Astro.props;
+const {
+  title,
+  description = 'Islamic content from the Quran, Sunnah, and the scholars of Ahl al-Sunnah.',
+  image = '/logo.jpg',
+  url = Astro.url.pathname,
+  noIndex = false,
+  className = ''
+} = Astro.props;
+
+const siteTitle = 'The Salaf\'s Path';
+const fullTitle = title === siteTitle ? title : `${title} | ${siteTitle}`;
+const siteUrl = import.meta.env.SITE || 'https://uponthepathofsalaf.vercel.app';
+const fullUrl = new URL(url, siteUrl).href;
+const fullImage = new URL(image, siteUrl).href;
 ---
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
+    <title>{fullTitle}</title>
     <meta name="description" content={description} />
     {noIndex && <meta name="robots" content="noindex" />}
     
+    <!-- Favicons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={fullImage} />
+    <meta property="og:url" content={fullUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteTitle} />
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={fullImage} />
+    
+    <!-- Canonical -->
+    <link rel="canonical" href={fullUrl} />
+    
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cinzel:wght@400;600;700;900&family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
     
-    <link rel="stylesheet" href="/src/styles/global.css" />
+    <!-- Global Styles -->
+    <link rel="stylesheet" href="/styles/global.css" />
   </head>
   <body>
     <div class="site-wrapper">
