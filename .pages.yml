@@ -3,13 +3,8 @@ site:
   title: "The Salaf's Path"
   description: "Islamic content from the Salaf"
 
-# Media uploads configuration
-media:
-  - name: images
-    input: public/images/uploads
-    output: /images/uploads
+# No media section needed – remove it entirely
 
-# Content collections
 collections:
   - name: posts
     label: Posts
@@ -17,6 +12,13 @@ collections:
     format: frontmatter
     create: true
     delete: true
+    
+    # Body goes here – top level, NOT inside fields
+    body:
+      label: Body
+      type: markdown
+      required: true
+    
     fields:
       - name: id
         label: ID
@@ -58,8 +60,3 @@ collections:
           - article
           - translation
         default: message
-        
-      - name: body
-        label: Body
-        type: markdown
-        required: true
