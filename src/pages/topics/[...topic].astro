@@ -25,6 +25,7 @@ const filteredPosts = allPosts
   .sort((a, b) => new Date(b.data.date) - new Date(a.data.date));
 
 function stripMarkdown(text: string): string {
+  if (!text) return '';
   return text
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/\*(.*?)\*/g, '$1')
@@ -93,13 +94,13 @@ function getExcerpt(body: string, maxLength = 130) {
         <div class="posts-grid">
           {filteredPosts.map((post) => (
             <PostCard
-              id={post.data.id}
+              id={post.id}
               title={post.data.title}
               date={post.data.date}
               author={post.data.author ?? undefined}
               quotedAuthor={post.data.quotedAuthor ?? undefined}
               topics={post.data.topics}
-              excerpt={getExcerpt(post.body)}
+              excerpt={getExcerpt(post.data.body)}
             />
           ))}
         </div>
