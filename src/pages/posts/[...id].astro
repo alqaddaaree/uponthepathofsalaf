@@ -62,24 +62,6 @@ function getExcerpt(body: string, maxLength = 130) {
 
 <Layout title={`${data.title} | The Salaf's Path`}>
   <article class="post-detail">
-    <!-- breadcrumb, topic pill, title, meta bar (unchanged) -->
-    <nav class="breadcrumb">
-      <a href="/">Home</a>
-      <span>/</span>
-      {data.topics && data.topics.length > 0 && (
-        <>
-          <a href={`/topics/${data.topics[0].toLowerCase()}`}>
-            {data.topics[0]}
-          </a>
-          <span>/</span>
-        </>
-      )}
-      <span style="color:var(--text);">{data.title}</span>
-    </nav>
-
-    {data.topics && data.topics.length > 0 && (
-      <div class="post-topic-pill">{data.topics.join(' · ')}</div>
-    )}
     <h1 class="post-main-title">{data.title}</h1>
 
     <div class="post-meta-bar">

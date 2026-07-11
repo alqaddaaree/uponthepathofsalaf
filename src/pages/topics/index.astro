@@ -1,37 +1,29 @@
 ---
-// src/pages/topics/index.astro
 import Layout from '../../layouts/Layout.astro';
 import { getCollection } from 'astro:content';
 
 const allPosts = await getCollection('posts');
+const allTopics = await getCollection('topics');
 
-const topicMap = new Map<string, number>();
+// Build a count map: topic slug → number of posts
+const countMap = new Map();
 for (const post of allPosts) {
-  for (const topic of post.data.topics || []) {
-    topicMap.set(topic, (topicMap.get(topic) || 0) + 1);
+  for (const slug of post.data.topics || []) {
+    countMap.set(slug, (countMap.get(slug) || 0) + 1);
   }
 }
 
-const topics = Array.from(topicMap.entries())
-  .map(([name, count]) => ({ name, count }))
-  .sort((a, b) => b.count - a.count);
-
-// Icons for topics (mapped by name)
-const topicIcons: Record<string, string> = {
-  Aqeedah: '🕌',
-  Fiqh: '⚖️',
-  Hadith: '📜',
-  Tafsir: '📖',
-  Seerah: '🌙',
-  Patience: '🌿',
-  Trials: '🔥',
-  Knowledge: '✨',
-  Tazkiyah: '💎',
-  Manhaj: '🛡️',
-  "Du'a": '🤲',
-  Dhikr: '🌟',
-};
-const defaultIcon = '📚';
+// Combine topic metadata with counts and sort by order
+const topicsWithData = allTopics
+  .map((topic) => ({
+    slug: topic.data.slug,
+    name: topic.data.name,
+    description: topic.data.description || `Lessons on ${topic.data.name}`,
+    count: countMap.get(topic.data.slug) || 0,
+    order: topic.data.order || 999,
+  }))
+  .filter((t) => t.count > 0)  // only show topics with posts
+  .sort((a, b) => a.order - b.order || a.name.localeCompare(b.name));
 ---
 
 <Layout title="Topics | The Salaf's Path">
@@ -47,18 +39,15 @@ const defaultIcon = '📚';
       </div>
 
       <div class="topics-grid">
-        {topics.map(({ name, count }) => {
-          const icon = topicIcons[name] || defaultIcon;
-          return (
-            <a href={`/topics/${name.toLowerCase()}`} class="topic-card">
-              <div class="topic-icon">{icon}</div>
-              <div class="topic-name">{name}</div>
-              <span class="topic-name-ar">—</span>
-              <p class="topic-desc">Lessons on {name.toLowerCase()}</p>
-              <div class="topic-count"><span>{count}</span> lesson{count > 1 ? 's' : ''}</div>
-            </a>
-          );
-        })}
+        {topicsWithData.map(({ slug, name, description, count }) => (
+          <a href={`/topics/${slug}`} class="topic-card">
+            <div class="topic-icon">📚</div>
+            <div class="topic-name">{name}</div>
+            <div class="topic-name-ar">—</div>
+            <p class="topic-desc">{description}</p>
+            <div class="topic-count"><span>{count}</span> lesson{count > 1 ? 's' : ''}</div>
+          </a>
+        ))}
       </div>
     </div>
   </div>

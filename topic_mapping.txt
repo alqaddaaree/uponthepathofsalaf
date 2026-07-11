@@ -1,0 +1,25 @@
+Old Topic Name → Slug
+========================================
+Aqeedah → aqeedah
+Character → character
+Death → death
+Du'a → dua
+Fiqh → fiqh
+Hadith → hadith
+Hajj → hajj
+Innovation → innovation
+Knowledge → knowledge
+Manhaj → manhaj
+Marriage → marriage
+Parents → parents
+Patience → patience
+Ramadan → ramadan
+Repentance → repentance
+Scholars → scholars
+Seerah → seerah
+Sincerity → sincerity
+Tafsir → tafsir
+Tawheed → tawheed
+The Salaf → the-salaf
+Trials → trials
+Women → women

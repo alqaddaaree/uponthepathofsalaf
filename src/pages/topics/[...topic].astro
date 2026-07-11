@@ -4,16 +4,10 @@ import PostCard from '../../components/PostCard.astro';
 import { getCollection } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
-  const allTopics = new Set<string>();
-  for (const post of posts) {
-    for (const topic of post.data.topics || []) {
-      allTopics.add(topic);
-    }
-  }
-  return Array.from(allTopics).map((topic) => ({
-    params: { topic: topic.toLowerCase() },
-    props: { topic },
+  const topics = await getCollection('topics');
+  return topics.map((topic) => ({
+    params: { topic: topic.data.slug },
+    props: { topic: topic.data },
   }));
 }
 
@@ -21,7 +15,7 @@ const { topic } = Astro.props;
 const allPosts = await getCollection('posts');
 
 const filteredPosts = allPosts
-  .filter((post) => post.data.topics?.includes(topic))
+  .filter((post) => post.data.topics?.includes(topic.slug))
   .sort((a, b) => new Date(b.data.date) - new Date(a.data.date));
 
 function stripMarkdown(text: string): string {
@@ -45,7 +39,7 @@ function getExcerpt(body: string, maxLength = 130) {
 }
 ---
 
-<Layout title={`${topic} | The Salaf's Path`}>
+<Layout title={`${topic.name} | The Salaf's Path`}>
   <div class="topic-header">
     <svg class="topic-header-geo" viewBox="0 0 1200 280" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -66,11 +60,9 @@ function getExcerpt(body: string, maxLength = 130) {
       </a>
 
       <div class="topic-badge">Topic</div>
-      <h1 class="topic-header-name">{topic}</h1>
+      <h1 class="topic-header-name">{topic.name}</h1>
       <div class="topic-header-ar">—</div>
-      <p class="topic-header-desc">
-        Lessons and content related to the topic of {topic.toLowerCase()}.
-      </p>
+      <p class="topic-header-desc">{topic.description || `Lessons and content related to ${topic.name}.`}</p>
 
       <div class="topic-stats">
         <div class="tstat">
@@ -84,7 +76,7 @@ function getExcerpt(body: string, maxLength = 130) {
   <div class="posts-section">
     <div class="container">
       <div class="section-hd">
-        <h2 class="section-title">Lessons on {topic}</h2>
+        <h2 class="section-title">Lessons on {topic.name}</h2>
         <span style="font-size:0.8125rem;color:var(--text-light);">
           {filteredPosts.length} lesson{filteredPosts.length > 1 ? 's' : ''}
         </span>

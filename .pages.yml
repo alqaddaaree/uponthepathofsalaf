@@ -1,4 +1,10 @@
+# .pages.yml
+site:
+  title: "The Salaf's Path"
+  description: "Islamic content from the Salaf"
+
 content:
+  # ---- POSTS COLLECTION ----
   - name: posts
     label: Posts
     type: collection
@@ -7,42 +13,29 @@ content:
     create: true
     delete: true
     fields:
-      - name: id
-        label: ID
-        type: string
-        required: true
-        help: "Unique number for this post (e.g., 1, 2, 3...)"
-      
       - name: title
         label: Title
         type: string
         required: true
-        help: "The main title of the post (this will appear as the heading)"
-      
       - name: date
         label: Date
         type: string
         required: true
-        help: "ISO format (e.g., 2025-11-07T19:11:46)"
-      
       - name: author
-        label: Author (optional)
+        label: Author
         type: string
-        help: "Who wrote the post (e.g., 'Upon the path of the Salaf')"
-      
+        required: false
       - name: quotedAuthor
-        label: Quoted Author (optional)
+        label: Quoted Author
         type: string
-        help: "If the post quotes a scholar, put their name here"
-      
+        required: false
       - name: topics
         label: Topics
-        type: string
-        list: true           # ← this works with YAML extension
-        help: "Add one topic per line (e.g., Hadith, Seerah, Tafsir)"
-        items:
-          type: string
-      
+        type: relation          # ← links to the topics collection
+        collection: topics
+        multiple: true
+        display: name           # shows topic name in the dropdown
+        required: false
       - name: type
         label: Type
         type: select
@@ -51,15 +44,45 @@ content:
           - article
           - translation
         default: message
-        help: "The nature of the post"
-      
       - name: edited
-        label: Last Edited (optional)
+        label: Edited
         type: string
-        help: "ISO format (e.g., 2026-04-03T20:32:00)"
-      
+        required: false
       - name: body
         label: Content
-        type: rich-text       # ← WYSIWYG editor (easier for non‑tech)
+        type: rich-text
         required: true
-        help: "Write the main content here. You can use bold, italic, lists, etc."
+
+  # ---- TOPICS COLLECTION ----
+  - name: topics
+    label: Topics
+    type: collection
+    path: src/content/topics
+    extension: yaml
+    create: true
+    delete: true
+    fields:
+      - name: name
+        label: Name
+        type: string
+        required: true
+      - name: slug
+        label: Slug
+        type: string
+        required: true
+        help: "URL-friendly identifier (e.g., 'hadith', 'knowledge')"
+      - name: description
+        label: Description
+        type: text
+        required: false
+      - name: icon
+        label: Icon (emoji)
+        type: string
+        required: false
+        help: "e.g., 📜, ✨, 🕌"
+      - name: order
+        label: Display Order
+        type: number
+        default: 999
+        required: false
+        help: "Lower numbers appear first"
