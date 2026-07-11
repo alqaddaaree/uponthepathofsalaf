@@ -57,7 +57,7 @@ content:
         required: true
       - name: topics
         label: Topics
-        type: relation
+        type: relationship
         collection: topics
         multiple: true
         display: name
