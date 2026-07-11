@@ -5,38 +5,51 @@ site:
 content:
   - name: posts
     label: Posts
-    type: collection               # ← required
+    type: collection
     path: src/content/posts
     format: frontmatter
     create: true
     delete: true
+    
+    # Body goes here, not inside fields
+    body:
+      label: Body
+      type: markdown
+      required: true
+    
     fields:
       - name: id
         label: ID
-        type: number
+        type: string         # changed from number
         required: true
+        
       - name: title
         label: Title
         type: string
         required: true
+        
       - name: date
         label: Date
         type: datetime
         required: true
+        
       - name: author
         label: Author
         type: string
         required: false
+        
       - name: quotedAuthor
         label: Quoted Author
         type: string
         required: false
+        
       - name: topics
         label: Topics
         type: list
         default: []
         items:
           type: string
+        
       - name: type
         label: Type
         type: select
@@ -45,7 +58,8 @@ content:
           - article
           - translation
         default: message
-      - name: body
-        label: Body
-        type: markdown            # or 'rich-text'
-        required: true
+      
+      - name: edited
+        label: Edited
+        type: datetime
+        required: false
