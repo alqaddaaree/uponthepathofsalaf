@@ -71,23 +71,20 @@ code, pre, .code {
   font-family: var(--font-code);
 }
 
-/* RTL support */
+/* RTL support – logical direction only */
 [dir="rtl"] {
   direction: rtl;
   text-align: right;
 }
 
-/* RTL blockquotes */
-[dir="rtl"] blockquote,
-[dir="rtl"] .post-body blockquote {
-  border-left: none;
-  border-right: 4px solid var(--accent);
-  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+[dir="ltr"] {
+  direction: ltr;
+  text-align: left;
 }
 
 /* 
   For mixed Arabic/English lines in the same paragraph:
-  Use text-align: start so the browser aligns based on direction
+  text-align: start respects the element's direction attribute.
 */
 .post-body p {
   text-align: start;
@@ -153,20 +150,7 @@ img {
   .section-hd { flex-wrap: wrap; gap: 0.5rem; }
   .section-title { font-size: 1.2rem; }
 }
-/* For paragraphs with dir="rtl" from the conversion */
-[dir="rtl"] {
-  text-align: right;
-}
 
-[dir="ltr"] {
-  text-align: left;
-}
-
-.post-body p {
-  text-align: start;
-}
-
-/* Add this to your global.css if not already present */
 /* === Post Card Styles (shared between static and dynamic search) === */
 .post-card {
   background: var(--card-bg);
@@ -176,6 +160,8 @@ img {
   overflow: hidden;
   transition: transform 0.22s, box-shadow 0.22s, border-color 0.22s;
   cursor: pointer;
+  max-width: 100%;          /* prevent overflow inside grid cell */
+  word-break: break-word;   /* break long unbroken strings */
 }
 .post-card:hover {
   transform: translateY(-3px);
@@ -193,6 +179,7 @@ img {
 .post-card.featured .card-excerpt {
   color: rgba(255,255,255,0.72);
   -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 .post-card.featured .card-topic-tag {
   background: rgba(201,168,76,0.18);
@@ -210,6 +197,7 @@ img {
 .post-card.featured .card-footer {
   border-color: rgba(255,255,255,0.12);
 }
+
 .card-bar {
   width: 4px;
   background: var(--accent);
@@ -217,13 +205,16 @@ img {
   transition: width 0.18s;
 }
 .post-card:hover .card-bar { width: 6px; }
+
 .card-body {
-  padding: 1.125rem 1.125rem 1rem 0.875rem;
+  padding-block: 1.125rem 1rem;      /* logical vertical */
+  padding-inline: 0.875rem 1.125rem; /* logical horizontal */
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-width: 0;
+  min-width: 0;                     /* prevent flex overflow */
 }
+
 .card-meta {
   display: flex;
   align-items: center;
@@ -243,6 +234,7 @@ img {
   border-radius: 3px;
 }
 .card-date { font-size: 0.72rem; color: var(--text-light); }
+
 .card-title {
   font-family: var(--font-title);
   font-size: 1rem;
@@ -251,6 +243,7 @@ img {
   line-height: 1.42;
   margin-bottom: 0.5rem;
 }
+
 .card-excerpt {
   font-size: 0.8375rem;
   color: var(--text-light);
@@ -259,9 +252,11 @@ img {
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+  line-clamp: 3;               /* standard property */
   overflow: hidden;
   font-family: var(--font-english), var(--font-arabic);
 }
+
 .card-footer {
   display: flex;
   align-items: center;
@@ -286,3 +281,14 @@ img {
   transition: gap 0.18s;
 }
 .post-card:hover .card-cta { gap: 0.45rem; }
+
+/* Blockquotes – logical border */
+blockquote,
+.post-body blockquote {
+  border-inline-start: 4px solid var(--accent);
+  border-start-start-radius: var(--radius-sm);
+  border-end-start-radius: var(--radius-sm);
+  padding-inline: 1rem 0.5rem;
+  margin: 1rem 0;
+  background: var(--light-gold);
+}

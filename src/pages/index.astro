@@ -187,6 +187,7 @@ const searchIndex = allPosts.map(post => ({
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 1.125rem;
+    width: 100%;               /* ensure it fills container */
   }
   .search-empty, .search-loading {
     text-align: center;
@@ -194,5 +195,24 @@ const searchIndex = allPosts.map(post => ({
     padding: 2rem 0;
     font-size: 1.1rem;
   }
-  .post-card-link { text-decoration: none; display: block; }
+  .post-card-link {
+    text-decoration: none;
+    display: block;
+    max-width: 100%;           /* constrain link to grid cell */
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .posts-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 600px) {
+    .posts-grid {
+      grid-template-columns: 1fr;
+    }
+    .post-card.featured .card-title {
+      font-size: 1.05rem;
+    }
+  }
 </style>

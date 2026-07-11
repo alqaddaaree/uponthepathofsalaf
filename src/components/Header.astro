@@ -10,7 +10,7 @@ const isActive = (path: string) => currentPath === path;
       <img src="/logo.jpg" alt="The Salaf's Path" class="logo-image" />
       <div class="logo-text">
         <span class="logo-en">The Salaf's Path</span>
-        <span class="logo-ar">درب السلف</span>
+        <span class="logo-ar">عَلَى نَهْجِ السَّلَف</span>
       </div>
     </a>
 
@@ -18,11 +18,7 @@ const isActive = (path: string) => currentPath === path;
     <nav class="header-nav">
       <a href="/" class={`nav-link ${isActive('/') ? 'active' : ''}`}>Home</a>
       <a href="/topics" class={`nav-link ${isActive('/topics') ? 'active' : ''}`}>Topics</a>
-      <a href="/search" class="nav-search-btn" aria-label="Search">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-        </svg>
-      </a>
+      <a href="/about" class={`nav-link ${isActive('/about') ? 'active' : ''}`}>About</a>
     </nav>
   </div>
 </header>
