@@ -3,16 +3,9 @@ content:
     label: Posts
     type: collection
     path: src/content/posts
-    format: frontmatter    # ← this tells PageCMS these are .md files with frontmatter
+    extension: yaml          # ← .yaml files, not .md
     create: true
     delete: true
-    
-    # Body goes HERE – outside fields
-    body:
-      label: Body
-      type: markdown
-      required: true
-    
     fields:
       - name: id
         label: ID
@@ -36,7 +29,7 @@ content:
         required: false
       - name: topics
         label: Topics
-        type: string        # comma-separated for now
+        type: string          # comma-separated for now
         required: false
       - name: type
         label: Type
@@ -50,3 +43,7 @@ content:
         label: Edited
         type: string
         required: false
+      - name: body            # body is now a regular field (inside fields)
+        label: Body
+        type: markdown        # or 'text' – both work in YAML
+        required: true
