@@ -39,15 +39,15 @@ const { totalPosts = 1500, totalTopics = 12, totalScholars = 60 } = Astro.props;
 
   <div class="hero-content">
     <div class="hero-bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
-    <h1 class="hero-title">The Salaf's Path</h1>
-    <div class="hero-subtitle-ar">درب السلف</div>
+    <h1 class="hero-title">Upong The Path Of The Salaf</h1>
+    <div class="hero-subtitle-ar">عَلَى نَهْجِ السَّلَفِ</div>
     <p class="hero-tagline">
       A curated library of Islamic knowledge from the Quran, Sunnah, and the scholars
       of Ahl al-Sunnah — for every seeker of sacred knowledge.
     </p>
 
     <div class="hero-search">
-      <input type="text" placeholder="Search lessons, scholars, topics…" id="hero-search-input">
+      <input type="text" placeholder="Search posts, scholars, topics…" id="hero-search-input">
       <button class="hero-search-btn" aria-label="Search">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -58,7 +58,7 @@ const { totalPosts = 1500, totalTopics = 12, totalScholars = 60 } = Astro.props;
     <div class="hero-stats">
       <div class="hero-stat">
         <span class="hero-stat-num">{totalPosts}+</span>
-        <span class="hero-stat-lbl">Lessons</span>
+        <span class="hero-stat-lbl">Posts</span>
       </div>
       <div class="hero-stat">
         <span class="hero-stat-num">{totalTopics}</span>
@@ -106,7 +106,7 @@ const { totalPosts = 1500, totalTopics = 12, totalScholars = 60 } = Astro.props;
     margin-bottom: 1.375rem;
   }
   .hero-title {
-    font-family: var(--font-ar);
+    font-family: var(--font-title);
     font-size: clamp(2rem, 5vw, 3.25rem);
     font-weight: 700;
     color: #fff;

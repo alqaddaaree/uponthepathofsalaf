@@ -14,6 +14,7 @@ const postsCollection = defineCollection({
     has_audio: z.boolean().default(false),
     has_file: z.boolean().default(false),
     body: z.string().optional(),
+    isIndex: z.boolean().default(false),
   }),
 });
 

@@ -103,6 +103,9 @@ img {
   max-width: var(--container);
   margin: 0 auto;
   padding: 0 1.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .section-hd {

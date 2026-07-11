@@ -18,7 +18,7 @@ const topicsWithData = allTopics
   .map((topic) => ({
     slug: topic.data.slug,
     name: topic.data.name,
-    description: topic.data.description || `Lessons on ${topic.data.name}`,
+    description: topic.data.description || `Posts on ${topic.data.name}`,
     count: countMap.get(topic.data.slug) || 0,
     order: topic.data.order || 999,
   }))

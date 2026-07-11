@@ -95,7 +95,7 @@ function getExcerpt(body: string, maxLength = 130) {
     {relatedPosts.length > 0 && (
       <div class="related-posts">
         <div class="section-hd">
-          <h2 class="section-title">Related Lessons</h2>
+          <h2 class="section-title">Related Posts</h2>
         </div>
         <div class="related-grid">
           {relatedPosts.map((p) => (
@@ -121,7 +121,15 @@ function getExcerpt(body: string, maxLength = 130) {
 
 <style>
   /* ⬇️ THIS MUST BE INCLUDED – it styles the post detail page */
-  .post-detail { max-width: 720px; margin: 0 auto; padding: 2.5rem 0 4rem; }
+  .post-detail {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2.5rem 0 4rem;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    word-wrap: break-word;
+  }
   
   .breadcrumb {
     display: flex;
@@ -131,6 +139,7 @@ function getExcerpt(body: string, maxLength = 130) {
     color: var(--text-light);
     margin-bottom: 2rem;
     font-family: var(--font-english);
+    flex-wrap: wrap; /* wrap on small screens */
   }
   .breadcrumb a:hover { color: var(--accent); }
   .breadcrumb span { color: var(--border); }
@@ -155,6 +164,7 @@ function getExcerpt(body: string, maxLength = 130) {
     color: var(--primary);
     line-height: 1.3;
     margin-bottom: 1.25rem;
+    word-wrap: break-word;
   }
   
   .post-meta-bar {
@@ -174,6 +184,7 @@ function getExcerpt(body: string, maxLength = 130) {
     font-size: 0.79rem;
     color: var(--text-light);
     font-family: var(--font-english);
+    word-wrap: break-word;
   }
   .meta-item svg { color: var(--accent); flex-shrink: 0; }
 
@@ -183,24 +194,37 @@ function getExcerpt(body: string, maxLength = 130) {
     color: var(--text);
     white-space: pre-wrap;
     word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    overflow-x: auto;
   }
   
   .post-body p, .post-body blockquote, .post-body h1, .post-body h2, .post-body h3, .post-body h4, .post-body li {
     font-family: var(--font-english), var(--font-arabic);
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   
-  .post-body p { margin-bottom: 1.25rem; }
+  .post-body p { 
+    margin-bottom: 1.25rem; 
+    word-wrap: break-word;
+  }
+
   .post-body h1, .post-body h2, .post-body h3, .post-body h4 {
     font-family: var(--font-title);
     color: var(--primary);
     margin: 2rem 0 0.75rem;
+    word-wrap: break-word;
   }
+
   .post-body blockquote {
     border-left: 4px solid var(--accent);
     background: var(--light-gold);
     padding: 1.25rem 1.5rem;
     margin: 1.75rem 0;
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
   .post-body blockquote p { margin-bottom: 0.5rem; font-style: italic; color: #3a3528; }
   .post-body blockquote cite {
@@ -216,7 +240,48 @@ function getExcerpt(body: string, maxLength = 130) {
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
   }
 
-  .post-tags { display: flex; gap: 0.4rem; flex-wrap: wrap; margin: 2rem 0; }
+  /* Code blocks and long pre elements */
+  .post-body pre,
+  .post-body code {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: var(--font-code);
+  }
+
+  /* Ensure images don't overflow */
+  .post-body img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Lists */
+  .post-body ul,
+  .post-body ol {
+    padding-left: 1.5rem;
+    margin: 0.75rem 0 1.25rem;
+    list-style-position: inside;
+    word-wrap: break-word;
+  }
+
+  .post-body li {
+    margin-bottom: 0.3rem;
+    line-height: 1.7;
+    word-wrap: break-word;
+  }
+
+  .post-body li p {
+    margin: 0;
+    display: inline;
+  }
+
+  .post-tags { 
+    display: flex; 
+    gap: 0.4rem; 
+    flex-wrap: wrap; 
+    margin: 2rem 0; 
+  }
   .tag {
     font-size: 0.72rem;
     padding: 0.22rem 0.6rem;
@@ -225,11 +290,19 @@ function getExcerpt(body: string, maxLength = 130) {
     border-radius: var(--radius-sm);
     color: var(--text-light);
     transition: all 0.18s;
+    word-wrap: break-word;
   }
   .tag:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
 
-  .related-posts { padding-top: 2rem; border-top: 1px solid var(--border); }
-  .related-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+  .related-posts { 
+    padding-top: 2rem; 
+    border-top: 1px solid var(--border); 
+  }
+  .related-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 1rem; 
+  }
 
   .post-footer-nav { margin-top: 2.5rem; }
   .back-link {
@@ -240,13 +313,36 @@ function getExcerpt(body: string, maxLength = 130) {
   }
   .back-link:hover { color: var(--primary); }
 
+  /* Responsive */
   @media (max-width: 768px) {
-    .post-detail { padding: 1.5rem 0; }
-    .related-grid { grid-template-columns: 1fr; }
-    .post-meta-bar { gap: 0.75rem; }
+    .post-detail { 
+      padding: 1.5rem 1rem; 
+    }
+    .related-grid { 
+      grid-template-columns: 1fr; 
+    }
+    .post-meta-bar { 
+      gap: 0.75rem; 
+    }
+    .post-body blockquote { 
+      padding: 0.8rem 1rem; 
+    }
+    .post-body ul,
+    .post-body ol {
+      padding-left: 1rem;
+    }
   }
   @media (max-width: 480px) {
-    .post-body blockquote { padding: 0.8rem 1rem; }
+    .post-body blockquote { 
+      padding: 0.6rem 0.8rem; 
+      margin: 1rem 0;
+    }
+    .post-body {
+      font-size: 0.9rem;
+    }
+    .post-main-title {
+      font-size: 1.2rem;
+    }
   }
 </style>
 
