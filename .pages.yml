@@ -2,9 +2,10 @@ site:
   title: "The Salaf's Path"
   description: "Islamic content from the Salaf"
 
-content:  # ← was "collections"
+content:
   - name: posts
     label: Posts
+    type: collection               # ← required
     path: src/content/posts
     format: frontmatter
     create: true
@@ -44,7 +45,7 @@ content:  # ← was "collections"
           - article
           - translation
         default: message
-      - name: body  # body goes INSIDE fields, not outside
+      - name: body
         label: Body
-        type: markdown
+        type: markdown            # or 'rich-text'
         required: true
