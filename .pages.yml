@@ -21,7 +21,7 @@ content:
         required: true
       - name: date
         label: Date
-        type: datetime
+        type: string        # ← changed from datetime
         required: true
       - name: author
         label: Author
@@ -33,10 +33,10 @@ content:
         required: false
       - name: topics
         label: Topics
-        type: list
-        default: []
-        items:
-          type: string
+        type: string        # ← changed from list
+        required: false
+        # For now, enter topics as a comma-separated list in a single text field.
+        # Example: "Hadith, Scholars, Seerah"
       - name: type
         label: Type
         type: select
@@ -47,9 +47,9 @@ content:
         default: message
       - name: edited
         label: Edited
-        type: datetime
+        type: string        # ← changed from datetime
         required: false
-      - name: body           # ← body INSIDE fields
+      - name: body
         label: Body
-        type: rich-text      # or 'markdown'
+        type: markdown      # ← or rich-text – both work
         required: true
