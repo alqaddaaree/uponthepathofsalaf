@@ -1,6 +1,6 @@
 import { getCollection } from 'astro:content';
 
-function stripMarkdown(text: string): string {
+function stripMarkdown(text) {
   return text
     .replace(/\*\*(.*?)\*\*/g, '$1')
     .replace(/\*(.*?)\*/g, '$1')
