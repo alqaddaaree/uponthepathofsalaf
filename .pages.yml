@@ -4,7 +4,7 @@ site:
   description: "Islamic content from the Salaf"
 
 content:
-  # ---- TOPICS COLLECTION (moved first) ----
+  # ---- TOPICS COLLECTION (must be defined first) ----
   - name: topics
     label: Topics
     type: collection
@@ -57,10 +57,10 @@ content:
         required: true
       - name: topics
         label: Topics
-        type: relationship
-        collection: topics
-        multiple: true
-        display: name
+        type: reference          # ← changed from "relation"
+        collection: topics       # ← references the topics collection
+        multiple: true           # ← allows selecting multiple topics
+        display: name            # ← shows topic name in the dropdown
         required: false
       - name: type
         label: Type
