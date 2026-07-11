@@ -1,57 +1,41 @@
-# .pages.yml
 site:
   title: "The Salaf's Path"
   description: "Islamic content from the Salaf"
 
-# No media section needed – remove it entirely
-
-collections:
+content:  # ← was "collections"
   - name: posts
     label: Posts
     path: src/content/posts
     format: frontmatter
     create: true
     delete: true
-    
-    # Body goes here – top level, NOT inside fields
-    body:
-      label: Body
-      type: markdown
-      required: true
-    
     fields:
       - name: id
         label: ID
         type: number
         required: true
-        
       - name: title
         label: Title
         type: string
         required: true
-        
       - name: date
         label: Date
         type: datetime
         required: true
-        
       - name: author
         label: Author
         type: string
         required: false
-        
       - name: quotedAuthor
         label: Quoted Author
         type: string
         required: false
-        
       - name: topics
         label: Topics
         type: list
         default: []
         items:
           type: string
-        
       - name: type
         label: Type
         type: select
@@ -60,3 +44,7 @@ collections:
           - article
           - translation
         default: message
+      - name: body  # body goes INSIDE fields, not outside
+        label: Body
+        type: markdown
+        required: true
